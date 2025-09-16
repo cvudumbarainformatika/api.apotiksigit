@@ -7,7 +7,7 @@ services:
                 uid: 1000
             context: ./
             dockerfile: Dockerfile.dev
-        container_name: apotik-app
+        container_name: apotik-sigit-app
         working_dir: /var/www/
         restart: unless-stopped
         # ports:
