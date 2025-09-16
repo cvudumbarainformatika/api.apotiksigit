@@ -19,7 +19,7 @@ services:
         networks:
             - harrynet
         depends_on:
-            - db
+            # - db
             - redis
 
     # db:
@@ -89,7 +89,7 @@ services:
         depends_on:
             - app
             - redis
-            - db
+            # - db
         volumes:
             - ./:/var/www
         env_file:
