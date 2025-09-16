@@ -1,0 +1,106 @@
+services:
+    app:
+        image: apotik-sigit-app
+        build:
+            args:
+                user: harry
+                uid: 1000
+            context: ./
+            dockerfile: Dockerfile.dev
+        container_name: apotik-app
+        working_dir: /var/www/
+        restart: unless-stopped
+        # ports:
+        #     - "8001:8000" # Menghindari konflik port dengan Nginx
+        environment:
+            - COMPOSER_MEMORY_LIMIT=-1
+        volumes:
+            - ./:/var/www
+        networks:
+            - harrynet
+        depends_on:
+            - db
+            - redis
+
+    # db:
+    #     image: mysql/mysql-server:5.7
+    #     platform: linux/amd64
+    #     container_name: mysql_apotik
+    #     restart: unless-stopped
+    #     environment:
+    #         MYSQL_DATABASE: ${DB_DATABASE:-local_laravel}
+    #         MYSQL_USER: ${DB_USERNAME:-local_developer}
+    #         MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+    #         MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+    #     ports:
+    #         - "3355:3306"
+    #     volumes:
+    #         - mysql_data:/var/lib/mysql
+    #         - ./docker-compose/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    #     networks:
+    #         - harrynet
+    #     healthcheck:
+    #         test:
+    #             [
+    #                 "CMD-SHELL",
+    #                 "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD}",
+    #             ]
+    #         interval: 10s
+    #         timeout: 5s
+    #         retries: 10
+
+    nginx:
+        image: nginx:alpine
+        container_name: nginx_apotiksigit
+        restart: unless-stopped
+        depends_on:
+            - app
+
+        ports:
+            # - "8182:80"
+            - "8185:80"
+        volumes:
+            - ./:/var/www
+            - ./docker-compose/nginx:/etc/nginx/conf.d
+        networks:
+            - harrynet
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost || exit 1"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 30s
+
+    redis:
+        image: redis:7
+        container_name: redis-server-apotik-sigit
+        restart: unless-stopped
+        volumes:
+            - redis_data:/data
+        ports:
+            - "26749:6379"
+        networks:
+            - harrynet
+
+    scheduler:
+        image: apotik-sigit-app # Pakai image dari app
+        container_name: apotik-sigit-scheduler
+        command: ["php", "artisan", "schedule:work"]
+        depends_on:
+            - app
+            - redis
+            - db
+        volumes:
+            - ./:/var/www
+        env_file:
+            - .env
+        networks:
+            - harrynet
+
+volumes:
+    # mysql_data:
+    redis_data:
+
+networks:
+    harrynet:
+        driver: bridge
