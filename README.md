@@ -22,12 +22,18 @@ Salin semua file kecuali `.env` dan `readme.md` di folder proyek Anda saat ini. 
 
 Copy all files except `.env` and `readme.md` in your current project folder. Overwrite the credentions from your `.env` locally with those provided here. If you dont want to overwrite database name and user, then please adjust the file in `docker-compose/mysql/init/01-databaes.sql` according to your needs.
 
+build container
+
+```sh
+docker-compose build
+```
+
 ## Step 2: Execute docker
 
 Jalankan container
 
 ```sh
-docker-compose up -d --build
+docker-compose up -d
 ```
 
 ## ----------- Step 2.1 : Jika Error --------
