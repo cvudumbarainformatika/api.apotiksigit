@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('kode');
             $table->string('satuan_k')->nullable();
             $table->string('satuan_b')->nullable();
+            $table->string('kode_merk')->nullable();
+            $table->string('kode_rak')->nullable();
+            $table->string('kode_kategori')->nullable();
             $table->integer('isi')->default(1);
             $table->string('kandungan')->nullable();
             $table->decimal('harga_jual_resep_k', 20, 2)->default(0);
