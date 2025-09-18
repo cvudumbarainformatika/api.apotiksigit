@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nopenerimaan');
             $table->string('noorder');
+            $table->string('kode_depo')->nullable();
             $table->string('kode_barang');
             $table->string('nobatch');
             $table->string('id_penerimaan_rinci');
