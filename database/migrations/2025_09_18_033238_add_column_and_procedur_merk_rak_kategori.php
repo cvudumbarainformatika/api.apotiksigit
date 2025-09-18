@@ -17,6 +17,7 @@ return new class extends Migration
             $table->bigInteger('kode_rak')->default(0)->after('id');
             $table->bigInteger('kode_merk')->default(0)->after('id');
             $table->bigInteger('kode_kategori')->default(0)->after('id');
+            $table->bigInteger('kode_mutasi')->default(0)->after('id');
         });
 
         // procedurs 
@@ -123,6 +124,40 @@ return new class extends Migration
 
                 END
         ");
+        DB::unprepared("DROP PROCEDURE IF EXISTS kode_mutasi;");
+        DB::unprepared("
+
+                CREATE DEFINER=`admin`@`%` PROCEDURE `kode_mutasi`(OUT nomor INT(12))
+                BEGIN
+
+                    DECLARE jml INT DEFAULT 0;
+
+                    DECLARE cur_query CURSOR FOR select kode_mutasi from counter;
+
+                    DECLARE CONTINUE HANDLER FOR NOT FOUND SET jml = 1;
+
+                    OPEN cur_query;
+
+                    WHILE (NOT jml) DO
+
+                        FETCH cur_query INTO nomor;
+
+                        IF NOT jml THEN
+
+                            update counter set kode_mutasi=kode_mutasi+1;
+
+                        END IF;
+
+                    END WHILE;
+
+
+
+                    CLOSE cur_query;
+
+
+
+                END
+        ");
     }
 
     /**
@@ -145,8 +180,14 @@ return new class extends Migration
                 $table->dropColumn('kode_kategori');
             });
         }
+        if (Schema::hasColumn('counter', 'kode_mutasi')) {
+            Schema::table('counter', function (Blueprint $table) {
+                $table->dropColumn('kode_mutasi');
+            });
+        }
         DB::unprepared("DROP PROCEDURE IF EXISTS kode_rak;");
         DB::unprepared("DROP PROCEDURE IF EXISTS kode_merk;");
         DB::unprepared("DROP PROCEDURE IF EXISTS kode_kategori;");
+        DB::unprepared("DROP PROCEDURE IF EXISTS kode_mutasi;");
     }
 };
