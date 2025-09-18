@@ -22,8 +22,18 @@ return new class extends Migration
             $table->string('kode_kategori')->nullable();
             $table->integer('isi')->default(1);
             $table->string('kandungan')->nullable();
-            $table->decimal('harga_jual_resep_k', 20, 2)->default(0);
-            $table->decimal('harga_jual_biasa_k', 20, 2)->default(0);
+            $table->decimal('harga_jual_umum', 20, 2)->default(0);
+            $table->decimal('harga_jual_resep', 20, 2)->default(0);
+            $table->decimal('harga_jual_cust', 20, 2)->default(0);
+            $table->decimal('harga_jual_prem', 20, 2)->default(0);
+
+            $table->integer('margin_jual_umum')->default(0);
+            $table->integer('margin_jual_resep')->default(0);
+            $table->integer('margin_jual_cust')->default(0);
+            $table->integer('margin_jual_prem')->default(0);
+
+            $table->integer('limit_stok')->default(0);
+
             $table->timestamps();
         });
     }

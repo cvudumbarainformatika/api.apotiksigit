@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->string('kode');
+            $table->string('hidden', 2)->nullable()->default(null);
             $table->timestamps();
         });
     }

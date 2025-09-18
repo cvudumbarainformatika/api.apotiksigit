@@ -2,10 +2,12 @@
 
 namespace App\Models\Master;
 
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Merk extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+    protected $guarded = ['id'];
 }

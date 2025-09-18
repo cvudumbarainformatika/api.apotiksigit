@@ -44,11 +44,21 @@ class BarangController extends Controller
             'satuan_k' => 'nullable',
             'satuan_b' => 'nullable',
             'isi' => 'nullable',
+            'kode_merk' => 'nullable',
+            'kode_rak' => 'nullable',
+            'kode_kategori' => 'nullable',
             'kandungan' => 'nullable',
-            'harga_jual_resep_k' => 'nullable',
-            'harga_jual_biasa_k' => 'nullable',
-            'persen_biasa' => 'nullable',
-            'persen_resep' => 'nullable',
+            'harga_jual_umum' => 'nullable',
+            'harga_jual_resep' => 'nullable',
+            'harga_jual_cust' => 'nullable',
+            'harga_jual_prem' => 'nullable',
+            'limit_stok' => 'nullable',
+            // disediakan untuk jaga2
+            'margin_jual_umum' => 'nullable',
+            'margin_jual_resep' => 'nullable',
+            'margin_jual_cust' => 'nullable',
+            'margin_jual_prem' => 'nullable',
+
         ], [
             'nama.required' => 'Nama wajib diisi.'
         ]);
