@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Perusahaan extends Model
 {
     use HasFactory;
+    protected $connection = 'eachy';
 }

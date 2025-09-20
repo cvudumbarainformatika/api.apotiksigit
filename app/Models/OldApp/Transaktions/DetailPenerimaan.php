@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class DetailPenerimaan extends Model
 {
     use HasFactory;
+    protected $connection = 'eachy';
 }

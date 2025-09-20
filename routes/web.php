@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DataMigration\CekDataController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -21,3 +22,5 @@ Route::get('/autogen', function () {
     $user = User::limit(10)->get();
     return $user;
 });
+
+Route::get('/cek', [CekDataController::class, 'index']);

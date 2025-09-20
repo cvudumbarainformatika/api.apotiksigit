@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class DistribusiAntarToko extends Model
 {
     use HasFactory;
+    protected $connection = 'eachy';
 }
