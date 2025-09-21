@@ -11,6 +11,8 @@ class CekDataController extends Controller
     //
     public function index()
     {
+        // beban
+        // beban
         $data = Product::limit(10)->get();
         return $data;
     }
