@@ -13,18 +13,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('counter', function (Blueprint $table) {
-            $table->bigInteger('kode_kategori')->default(0)->after('kode_barang');
+            $table->bigInteger('kode_kategori_expired')->default(0)->after('kode_barang');
         });
-        DB::unprepared("DROP PROCEDURE IF EXISTS kode_kategori;");
+        DB::unprepared("DROP PROCEDURE IF EXISTS kode_kategori_expired;");
 
         DB::unprepared("
 
-                CREATE DEFINER=`admin`@`%` PROCEDURE `kode_kategori`(OUT nomor INT(12))
+                CREATE DEFINER=`admin`@`%` PROCEDURE `kode_kategori_expired`(OUT nomor INT(12))
                 BEGIN
 
                     DECLARE jml INT DEFAULT 0;
 
-                    DECLARE cur_query CURSOR FOR select kode_kategori from counter;
+                    DECLARE cur_query CURSOR FOR select kode_kategori_expired from counter;
 
                     DECLARE CONTINUE HANDLER FOR NOT FOUND SET jml = 1;
 
@@ -36,7 +36,7 @@ return new class extends Migration
 
                         IF NOT jml THEN
 
-                            update counter set kode_kategori=kode_kategori+1;
+                            update counter set kode_kategori_expired=kode_kategori_expired+1;
 
                         END IF;
 
@@ -57,11 +57,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasColumn('counter', 'kode_kategori')) {
+        if (Schema::hasColumn('counter', 'kode_kategori_expired')) {
             Schema::table('counter', function (Blueprint $table) {
-                $table->dropColumn('kode_kategori');
+                $table->dropColumn('kode_kategori_expired');
             });
         }
-        DB::unprepared("DROP PROCEDURE IF EXISTS kode_kategori;");
+        DB::unprepared("DROP PROCEDURE IF EXISTS kode_kategori_expired;");
     }
 };

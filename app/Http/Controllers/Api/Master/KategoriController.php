@@ -49,9 +49,9 @@ class KategoriController extends Controller
         ]);
 
         if (!$kode) {
-            DB::select('call kode_kategori(@nomor)');
-            $nomor = DB::table('counter')->select('kode_kategori')->first();
-            $validated['kode'] = FormatingHelper::genKodeDinLength($nomor->kode_kategori, 4, 'KTG');
+            DB::select('call kode_kategori_expired(@nomor)');
+            $nomor = DB::table('counter')->select('kode_kategori_expired')->first();
+            $validated['kode'] = FormatingHelper::genKodeDinLength($nomor->kode_kategori_expired, 4, 'KTG');
         }
 
         $data = Kategori::updateOrCreate(
