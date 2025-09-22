@@ -9,4 +9,10 @@ class Info extends Model
 {
     use HasFactory;
     protected $connection = 'eachy';
+    protected $casts = [
+        'infos' => 'array',
+        'themes' => 'array',
+        'menus' => 'array',
+        'levels' => 'array',
+    ];
 }
