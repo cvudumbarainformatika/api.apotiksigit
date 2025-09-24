@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('bebans', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_beban');
+            $table->string('kode');
+            $table->string('nama');
             $table->string('flag');
             $table->timestamps();
         });
