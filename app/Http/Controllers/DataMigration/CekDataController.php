@@ -52,6 +52,11 @@ class CekDataController extends Controller
         // $info = self::migrasiDataInfo();
         // // 6. ketegori
         // $ketegori = self::migrasiDataKategori();
+
+        // // 7.0 Jabatan User
+        // $jabatan = self::migrasiDataKategori();
+        // // 7.1 User
+        // $ketegori = self::migrasiDataKategori();
         return [
             // 'beban' => $beban,
             // 'cabang' => $cabang,
