@@ -60,30 +60,30 @@ class CekDataController extends Controller
          */
         // 1. beban 
         $beban = self::migrasiDataBeban();
-        // // 2. cabang
+        // 2. cabang
         $cabang = self::migrasiDataCabang();
-        // // 3. customer
+        // 3. customer
         $customer = self::migrasiDataCustomer();
-        // // 4. dokter
+        // 4. dokter
         $dokter = self::migrasiDataDokter();
-        // // 5. info
+        // 5. info
         $info = self::migrasiDataInfo();
-        // // 6. ketegori
+        // 6. ketegori
         $ketegori = self::migrasiDataKategori();
-        // // 7. Perusahaan 
+        // 7. Perusahaan 
         $perusahaan = self::migrasiDataPerusahaan();
-        // // 8. Rak 
+        // 8. Rak 
         $rak = self::migrasiDataRak();
-        // // 9. Satuan 
+        // 9. Satuan 
         $satuan = self::migrasiDataSatuan();
-        // // 10. Merk 
+        // 10. Merk 
         $merk = self::migrasiDataMerk();
-        // // 11. Product 
+        // 11. Product 
         $product = self::migrasiDataProduct();
 
-        // // 11.0 Jabatan User
+        // 11.0 Jabatan User
         $jabatan = self::migrasiDataJabatan();
-        // // 11.1 User
+        // 11.1 User
         $user = self::migrasiDataUser();
 
         return [
