@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('barcode');
             $table->string('satuan_k')->nullable();
             $table->string('satuan_b')->nullable();
-            $table->string('kode_merk')->nullable();
-            $table->string('kode_rak')->nullable();
-            $table->string('kode_kategori')->nullable();
+            $table->string('merk')->nullable();
+            $table->string('rak')->nullable();
+            $table->string('kategori')->nullable();
             $table->integer('isi')->default(1);
             $table->string('kandungan')->nullable();
             $table->decimal('harga_jual_umum', 20, 2)->default(0);
