@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('noorder');
             $table->string('kode_depo')->nullable();
             $table->string('kode_barang');
-            $table->string('nobatch');
-            $table->string('id_penerimaan_rinci');
-            $table->decimal('isi', 20, 0)->default(0);
+            $table->string('nobatch')->nullable();
+            $table->string('id_penerimaan_rinci')->nullable();
+            $table->decimal('isi', 20, 0)->default(1);
             $table->string('satuan_b');
             $table->string('satuan_k');
             $table->decimal('jumlah_b', 20, 0)->default(0);
