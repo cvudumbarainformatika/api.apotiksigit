@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DataMigration\CekDataController;
+use App\Models\Setting\Menu;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -23,4 +24,17 @@ Route::get('/autogen', function () {
     return $user;
 });
 
-Route::get('/cek', [CekDataController::class, 'index']);
+Route::get('/cek', function () {
+    $laporan = Menu::firstOrCreate(
+        ['title' => 'Laporan'],
+        [
+            'icon' => 'layers',
+            'url' => 'admin/laporan',
+            'name' => null,
+            'view' => null,
+            'component' => null,
+        ]
+    );
+    $laporan->load('children');
+    return $laporan;
+});

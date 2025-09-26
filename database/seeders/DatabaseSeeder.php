@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
         }
         // seeder menu
         // dahsboard
-        $dashoard = Menu::updateOrCreate(
+        $dashoard = Menu::firstOrCreate(
             ['title' => 'Dashboard'],
             [
                 'icon' => 'home',
@@ -58,7 +58,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
         //  MASTER
-        $master = Menu::updateOrCreate(
+        $master = Menu::firstOrCreate(
             ['title' => 'Master'],
             [
                 'icon' => 'layers',
@@ -166,7 +166,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
         //  TRANSAKSI
-        $transaksi = Menu::updateOrCreate(
+        $transaksi = Menu::firstOrCreate(
             ['title' => 'Transaksi'],
             [
                 'icon' => 'layers',
@@ -215,6 +215,18 @@ class DatabaseSeeder extends Seeder
         );
         $transaksi->children()->updateOrCreate(
             [
+                'title' => 'Retur Penjualan',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/transaksi/returpenjualan',
+                'name' => 'transaksi.returpenjualan',
+                'view' => '/views/transaksi/returpenjualan',
+                'component' => 'IndexPage',
+            ]
+        );
+        $transaksi->children()->updateOrCreate(
+            [
                 'title' => 'Stock List',
             ],
             [
@@ -250,7 +262,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
         //  LAPORAN
-        $laporan = Menu::updateOrCreate(
+        $laporan = Menu::firstOrCreate(
             ['title' => 'Laporan'],
             [
                 'icon' => 'layers',
@@ -272,8 +284,56 @@ class DatabaseSeeder extends Seeder
                 'component' => 'IndexPage',
             ]
         );
+        $laporan->children()->updateOrCreate(
+            [
+                'title' => 'Laporan Penjualan',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/laporan/penjualan',
+                'name' => 'laporan.penjualan',
+                'view' => '/views/laporan/penjualan',
+                'component' => 'IndexPage',
+            ]
+        );
+        $laporan->children()->updateOrCreate(
+            [
+                'title' => 'Laporan Pembelian',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/laporan/pembelian',
+                'name' => 'laporan.pembelian',
+                'view' => '/views/laporan/pembelian',
+                'component' => 'IndexPage',
+            ]
+        );
+        $laporan->children()->updateOrCreate(
+            [
+                'title' => 'Laporan Labarugi',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/laporan/labarugi',
+                'name' => 'laporan.labarugi',
+                'view' => '/views/laporan/labarugi',
+                'component' => 'IndexPage',
+            ]
+        );
+        $laporan->children()->updateOrCreate(
+            [
+                'title' => 'Laporan Hutang',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/laporan/hutang',
+                'name' => 'laporan.hutang',
+                'view' => '/views/laporan/hutang',
+                'component' => 'IndexPage',
+            ]
+        );
         //  Setting
-        $setting = Menu::updateOrCreate(
+        $setting = Menu::firstOrCreate(
             ['title' => 'Settings'],
             [
                 'icon' => 'layers',
@@ -292,6 +352,18 @@ class DatabaseSeeder extends Seeder
                 'url' => 'admin/settings/aplikasi',
                 'name' => 'settings.aplikasi',
                 'view' => '/views/settings/aplikasi',
+                'component' => 'IndexPage',
+            ]
+        );
+        $setting->children()->updateOrCreate(
+            [
+                'title' => 'Hak Akses',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/settings/hak-akses',
+                'name' => 'settings.hakakses',
+                'view' => '/views/settings/hakakses',
                 'component' => 'IndexPage',
             ]
         );
