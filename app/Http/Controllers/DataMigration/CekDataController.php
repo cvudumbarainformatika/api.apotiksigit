@@ -29,6 +29,7 @@ use App\Models\OldApp\Master\Satuan as MasterSatuan;
 use App\Models\OldApp\Master\SatuanBesar;
 use App\Models\OldApp\Master\Supplier as MasterSupplier;
 use App\Models\Setting\ProfileToko;
+use App\Models\Transactions\Stok;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -59,47 +60,51 @@ class CekDataController extends Controller
          * khusus satuan dan satuan besar, maka ambil id palin besar untuk update counter
          */
         // 1. beban 
-        $beban = self::migrasiDataBeban();
-        // 2. cabang
-        $cabang = self::migrasiDataCabang();
-        // 3. customer
-        $customer = self::migrasiDataCustomer();
-        // 4. dokter
-        $dokter = self::migrasiDataDokter();
-        // 5. info
-        $info = self::migrasiDataInfo();
-        // 6. ketegori
-        $ketegori = self::migrasiDataKategori();
-        // 7. Perusahaan 
-        $perusahaan = self::migrasiDataPerusahaan();
-        // 8. Rak 
-        $rak = self::migrasiDataRak();
-        // 9. Satuan 
-        $satuan = self::migrasiDataSatuan();
-        // 10. Merk 
-        $merk = self::migrasiDataMerk();
-        // 11. Product 
-        $product = self::migrasiDataProduct();
+        // $beban = self::migrasiDataBeban();
+        // // 2. cabang
+        // $cabang = self::migrasiDataCabang();
+        // // 3. customer
+        // $customer = self::migrasiDataCustomer();
+        // // 4. dokter
+        // $dokter = self::migrasiDataDokter();
+        // // 5. info
+        // $info = self::migrasiDataInfo();
+        // // 6. ketegori
+        // $ketegori = self::migrasiDataKategori();
+        // // 7. Perusahaan 
+        // $perusahaan = self::migrasiDataPerusahaan();
+        // // 8. Rak 
+        // $rak = self::migrasiDataRak();
+        // // 9. Satuan 
+        // $satuan = self::migrasiDataSatuan();
+        // // 10. Merk 
+        // $merk = self::migrasiDataMerk();
+        // // 11. Product 
+        // $product = self::migrasiDataProduct();
 
-        // 11.0 Jabatan User
-        $jabatan = self::migrasiDataJabatan();
-        // 11.1 User
-        $user = self::migrasiDataUser();
+        // // 11.0 Jabatan User
+        // $jabatan = self::migrasiDataJabatan();
+        // // 11.1 User
+        // $user = self::migrasiDataUser();
+
+        // 12 stok
+        $stok = self::migrasiDataStok();
 
         return [
-            'beban' => $beban,
-            'cabang' => $cabang,
-            'customer' => $customer,
-            'dokter' => $dokter,
-            'info' => $info,
-            'ketegori' => $ketegori,
-            'perusahaan' => $perusahaan,
-            'rak' => $rak,
-            'satuan' => $satuan,
-            'merk' => $merk,
-            'product' => $product,
-            'jabatan' => $jabatan,
-            'user' => $user,
+            // 'beban' => $beban,
+            // 'cabang' => $cabang,
+            // 'customer' => $customer,
+            // 'dokter' => $dokter,
+            // 'info' => $info,
+            // 'ketegori' => $ketegori,
+            // 'perusahaan' => $perusahaan,
+            // 'rak' => $rak,
+            // 'satuan' => $satuan,
+            // 'merk' => $merk,
+            // 'product' => $product,
+            // 'jabatan' => $jabatan,
+            // 'user' => $user,
+            'stok' => $stok,
         ];
     }
     public static function migrasiDataBeban()
@@ -770,5 +775,53 @@ class CekDataController extends Controller
                 'file' => $th->getFile(),
             ];
         }
+    }
+    public static function migrasiDataStok()
+    {
+        $product = Product::select('id', 'kode_produk', 'harga_beli')
+            ->limit(100)
+            ->get();
+        $product->append('stok');
+        $kode = $product->pluck('kode_produk');
+        $barang = Barang::whereIn('kode', $kode)->get();
+        $stok = Stok::whereIn('kode_barang', $kode)->get();
+        $profile = ProfileToko::first();
+        foreach ($product as $key) {
+            if ($key['stok'] != 0) {
+                $dataStok = $stok->firstWhere('kode_barang', $key['kode_produk']);
+                $dataBarang = $barang->firstWhere('kode', $key['kode_produk']);
+                if ($dataStok) {
+                    $jum = $key['stok'] + $dataStok->jumlah_k;
+                    $dataStok->update(['jumlah_k', $jum]);
+                } else {
+                    Stok::create([
+                        'nopenerimaan' => '',
+                        'noorder' => '',
+                        'nobatch' => '',
+                        'id_penerimaan_rinci' => '',
+                        'jumlah_b' => 0,
+                        'pajak_rupiah' => 0,
+                        'diskon_persen' => 0,
+                        'diskon_rupiah' => 0,
+                        'harga_total' => 0,
+                        'subtotal' => 0,
+                        'tgl_exprd' => date('Y-m-d'),
+                        'isi' => $dataBarang['isi'],
+                        'harga_beli' => $key['harga_beli'],
+                        'satuan_b' => $dataBarang['satuan_b'],
+                        'kode_user' => '',
+                        ////
+                        'kode_depo' => $profile->kode_toko,
+                        'kode_barang' => $key['kode_produk'],
+                        'satuan_k' => $dataBarang['satuan_k'],
+                        'jumlah_k' => $key['stok'],
+                    ]);
+                }
+            }
+        }
+        return [
+            'kode' => $kode,
+            'product' => $product,
+        ];
     }
 }
