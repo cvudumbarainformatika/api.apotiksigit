@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Master;
 
+use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Master\Beban;
@@ -32,7 +33,6 @@ class BebanController extends Controller
 
         $resp = ResponseHelper::responseGetSimplePaginate($data, $req, $totalCount);
         return new JsonResponse($resp);
-
     }
 
     public function store(Request $request)
@@ -50,6 +50,8 @@ class BebanController extends Controller
             ],
             $validated
         );
+        $kode = FormatingHelper::genKodeBarang($data->id, 'BBN');
+        $data->update(['kode' => $kode]);
         return new JsonResponse([
             'data' => $data,
             'message' => 'Data Beban berhasil disimpan'
@@ -70,5 +72,4 @@ class BebanController extends Controller
             'message' => 'Data Beban berhasil dihapus'
         ]);
     }
-
 }
