@@ -818,8 +818,8 @@ class CekDataController extends Controller
                     $dataStok = $stok->firstWhere('kode_barang', $key['kode_produk']);
                     $dataBarang = $barang->firstWhere('kode', $key['kode_produk']);
                     if ($dataStok) {
-                        // $jum = $key['stok'] + $dataStok->jumlah_k;
-                        // $dataStok->update(['jumlah_k' => $jum]);
+                        $jum = $key['stok'];
+                        $dataStok->update(['jumlah_k' => $jum]);
                     } else {
                         Stok::create([
                             'kode_depo' => $profile->kode_toko,
