@@ -88,7 +88,7 @@ class CekDataController extends Controller
         // $user = self::migrasiDataUser();
 
         // 12 stok
-        $stok = self::migrasiDataStok();
+        // $stok = self::migrasiDataStok();
 
         return [
             // 'beban' => $beban,
@@ -104,7 +104,7 @@ class CekDataController extends Controller
             // 'product' => $product,
             // 'jabatan' => $jabatan,
             // 'user' => $user,
-            'stok' => $stok,
+            // 'stok' => $stok,
         ];
     }
     public static function migrasiDataBeban()
@@ -133,7 +133,8 @@ class CekDataController extends Controller
             }
             DB::commit();
             return [
-                'message' => 'data Beban sudah di isi'
+                'message' => 'data Beban sudah di isi',
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -142,6 +143,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -172,6 +174,7 @@ class CekDataController extends Controller
             return [
                 'message' => 'data Profile sudah di isi',
                 'profile' => $profile ?? null,
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -180,6 +183,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -208,7 +212,8 @@ class CekDataController extends Controller
             }
             DB::commit();
             return [
-                'message' => 'data Cabang sudah di isi'
+                'message' => 'data Cabang sudah di isi',
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -217,6 +222,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -260,6 +266,7 @@ class CekDataController extends Controller
                 'message' => 'data Pelanggan sudah di isi',
                 'lastId' => $lastId,
                 'counter' => $counter,
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -268,6 +275,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -310,6 +318,7 @@ class CekDataController extends Controller
                 'message' => 'data Dokter sudah di isi',
                 'lastId' => $lastId,
                 'counter' => $counter,
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -318,6 +327,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -359,6 +369,7 @@ class CekDataController extends Controller
                 'message' => 'data Kategori sudah di isi',
                 'lastId' => $lastId,
                 'counter' => $counter,
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -367,6 +378,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -412,6 +424,7 @@ class CekDataController extends Controller
                 'message' => 'data Supplier sudah di isi',
                 'lastId' => $lastId,
                 'counter' => $counter,
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -420,6 +433,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -461,6 +475,7 @@ class CekDataController extends Controller
                 'message' => 'data Rak sudah di isi',
                 'lastId' => $lastId,
                 'counter' => $counter,
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -469,6 +484,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -510,6 +526,7 @@ class CekDataController extends Controller
                 'message' => 'data Merk sudah di isi',
                 'lastId' => $lastId,
                 'counter' => $counter,
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -518,6 +535,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -575,6 +593,7 @@ class CekDataController extends Controller
                 'message' => 'data Satuan sudah di isi',
                 'lastId' => $lastId,
                 'counter' => $counter,
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -583,6 +602,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -655,6 +675,7 @@ class CekDataController extends Controller
                 'message' => 'data Barang sudah di isi',
                 'lastId' => $lastId,
                 'counter' => $counter,
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -663,6 +684,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -708,6 +730,7 @@ class CekDataController extends Controller
                 'message' => 'data Jabatan sudah di isi',
                 'lastId' => $lastId,
                 'counter' => $counter,
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -716,6 +739,7 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
@@ -765,6 +789,7 @@ class CekDataController extends Controller
                 'message' => 'data User sudah di isi',
                 'lastId' => $lastId,
                 'counter' => $counter,
+                'status' => true
             ];
         } catch (\Throwable $th) {
 
@@ -773,55 +798,50 @@ class CekDataController extends Controller
                 'message' => $th->getMessage(),
                 'line' => $th->getLine(),
                 'file' => $th->getFile(),
+                'status' => false
             ];
         }
     }
     public static function migrasiDataStok()
     {
-        $product = Product::select('id', 'kode_produk', 'harga_beli')
-            ->limit(100)
-            ->get();
-        $product->append('stok');
-        $kode = $product->pluck('kode_produk');
-        $barang = Barang::whereIn('kode', $kode)->get();
-        $stok = Stok::whereIn('kode_barang', $kode)->get();
-        $profile = ProfileToko::first();
-        foreach ($product as $key) {
-            if ($key['stok'] != 0) {
-                $dataStok = $stok->firstWhere('kode_barang', $key['kode_produk']);
-                $dataBarang = $barang->firstWhere('kode', $key['kode_produk']);
-                if ($dataStok) {
-                    $jum = $key['stok'] + $dataStok->jumlah_k;
-                    $dataStok->update(['jumlah_k', $jum]);
-                } else {
-                    Stok::create([
-                        'nopenerimaan' => '',
-                        'noorder' => '',
-                        'nobatch' => '',
-                        'id_penerimaan_rinci' => '',
-                        'jumlah_b' => 0,
-                        'pajak_rupiah' => 0,
-                        'diskon_persen' => 0,
-                        'diskon_rupiah' => 0,
-                        'harga_total' => 0,
-                        'subtotal' => 0,
-                        'tgl_exprd' => date('Y-m-d'),
-                        'isi' => $dataBarang['isi'],
-                        'harga_beli' => $key['harga_beli'],
-                        'satuan_b' => $dataBarang['satuan_b'],
-                        'kode_user' => '',
-                        ////
-                        'kode_depo' => $profile->kode_toko,
-                        'kode_barang' => $key['kode_produk'],
-                        'satuan_k' => $dataBarang['satuan_k'],
-                        'jumlah_k' => $key['stok'],
-                    ]);
+        try {
+            DB::beginTransaction();
+            $product = Product::select('id', 'kode_produk', 'harga_beli')
+                ->limit(100)
+                ->get();
+            $product->append('stok');
+            $kode = $product->pluck('kode_produk');
+            $barang = Barang::whereIn('kode', $kode)->get();
+            $stok = Stok::whereIn('kode_barang', $kode)->get();
+            $profile = ProfileToko::first();
+            foreach ($product as $key) {
+                if ($key['stok'] != 0) {
+                    $dataStok = $stok->firstWhere('kode_barang', $key['kode_produk']);
+                    $dataBarang = $barang->firstWhere('kode', $key['kode_produk']);
+                    if ($dataStok) {
+                        $jum = $key['stok'] + $dataStok->jumlah_k;
+                        $dataStok->update(['jumlah_k' => $jum]);
+                    } else {
+                        Stok::create([
+                            'kode_depo' => $profile->kode_toko,
+                            'kode_barang' => $key['kode_produk'],
+                            'satuan_k' => $dataBarang['satuan_k'],
+                            'jumlah_k' => $key['stok'],
+                        ]);
+                    }
                 }
             }
+            DB::commit();
+            return [
+                'message' => 'data Stok sudah di isi',
+                'status' => true
+            ];
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return [
+                'message' => 'data Stok gagal disimpan ' . $e->getMessage(),
+                'status' => true
+            ];
         }
-        return [
-            'kode' => $kode,
-            'product' => $product,
-        ];
     }
 }
