@@ -807,7 +807,6 @@ class CekDataController extends Controller
         try {
             DB::beginTransaction();
             $product = Product::select('id', 'kode_produk', 'harga_beli')
-                ->limit(100)
                 ->get();
             $product->append('stok');
             $kode = $product->pluck('kode_produk');
@@ -819,8 +818,8 @@ class CekDataController extends Controller
                     $dataStok = $stok->firstWhere('kode_barang', $key['kode_produk']);
                     $dataBarang = $barang->firstWhere('kode', $key['kode_produk']);
                     if ($dataStok) {
-                        $jum = $key['stok'] + $dataStok->jumlah_k;
-                        $dataStok->update(['jumlah_k' => $jum]);
+                        // $jum = $key['stok'] + $dataStok->jumlah_k;
+                        // $dataStok->update(['jumlah_k' => $jum]);
                     } else {
                         Stok::create([
                             'kode_depo' => $profile->kode_toko,
