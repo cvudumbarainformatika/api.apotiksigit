@@ -38,14 +38,14 @@ class BebanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_beban' => 'required',
+            'nama' => 'required',
         ], [
-            'nama_beban.required' => 'Nama wajib diisi.',
+            'nama.required' => 'Nama wajib diisi.',
         ]);
 
         $data = Beban::updateOrCreate(
             [
-                'nama_beban' => $validated['nama_beban'],
+                'nama' => $validated['nama'],
                 'flag' => ''
             ],
             $validated

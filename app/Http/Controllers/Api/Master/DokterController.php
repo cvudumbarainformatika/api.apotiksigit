@@ -25,7 +25,7 @@ class DokterController extends Controller
 
         $raw->when(request('q'), function ($q) {
             $q->where(function ($query) {
-                $query->where('nama_dokter', 'like', '%' . request('q') . '%')
+                $query->where('nama', 'like', '%' . request('q') . '%')
                     ->orWhere('kode', 'like', '%' . request('q') . '%');
             });
         })->whereNull('hidden')
@@ -41,7 +41,7 @@ class DokterController extends Controller
     {
         $kode = $request->kode;
         $validated = $request->validate([
-            'nama_dokter' => 'required',
+            'nama' => 'required',
             'kode' => 'nullable',
             'alamat' => 'required',
         ], [
