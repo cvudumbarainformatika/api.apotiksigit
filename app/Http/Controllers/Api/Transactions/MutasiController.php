@@ -23,13 +23,7 @@ class MutasiController extends Controller
     public function getCabang()
     {
         $data = Cabang::select('kodecabang', 'namacabang')->get()->toArray();
-        array_unshift(
-            $data,
-            [
-                'kodecabang' => null,
-                'namacabang' => 'Gudang',
-            ]
-        );
+
 
         return new JsonResponse([
             'data' => $data
