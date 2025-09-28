@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('kategori')->nullable();
             $table->integer('isi')->default(1);
             $table->string('kandungan')->nullable();
+            $table->decimal('harga_beli', 20, 2)->default(0);
             $table->decimal('harga_jual_umum', 20, 2)->default(0);
             $table->decimal('harga_jual_resep', 20, 2)->default(0);
             $table->decimal('harga_jual_cust', 20, 2)->default(0);

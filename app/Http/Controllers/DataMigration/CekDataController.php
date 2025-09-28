@@ -643,6 +643,7 @@ class CekDataController extends Controller
                     'kategori' => $key['kategori'] ? $key['kategori']['nama'] : '',
                     'isi' => $key['pengali'],
                     'kandungan' => '',
+                    'harga_beli' => $key['harga_beli'],
                     'harga_jual_umum' => $key['harga_jual_umum'],
                     'harga_jual_resep' => $key['harga_jual_resep'],
                     'harga_jual_cust' => $key['harga_jual_cust'],
