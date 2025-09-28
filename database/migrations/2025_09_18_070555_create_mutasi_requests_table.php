@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('kode_mutasi');
             $table->string('kode_barang');
+            $table->string('satuan_k');
             $table->decimal('jumlah', 20, 2)->default(0);
             $table->decimal('distribusi', 20, 2)->default(0);
             $table->decimal('harga_beli', 20, 2)->default(0);

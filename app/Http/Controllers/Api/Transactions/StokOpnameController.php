@@ -28,9 +28,7 @@ class StokOpnameController extends Controller
             ->leftjoin('barangs', 'stok_opnames.kode_barang', '=', 'barangs.kode')
             ->when(request('q'), function ($q) {
                 $q->where(function ($query) {
-                    $query->where('stoks.nopenerimaan', 'like', '%' . request('q') . '%')
-                        ->orWhere('stoks.noorder', 'like', '%' . request('q') . '%')
-                        ->orWhere('barangs.nama', 'like', '%' . request('q') . '%');
+                    $query->where('barangs.nama', 'like', '%' . request('q') . '%');
                 });
             })
             ->with([
