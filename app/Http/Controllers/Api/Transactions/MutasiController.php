@@ -359,7 +359,10 @@ class MutasiController extends Controller
                 $stk->update(['jumlah_k' => $sisa]);
             }
 
-            $mutasi->update(['status' => '2']);
+            $mutasi->update([
+                'status' => '2',
+                'tgl_distribusi' => Carbon::now()->format('Y-m-d H:i:s')
+            ]);
             DB::commit();
             $mutasi->load([
                 'rinci' => function ($q) {
@@ -393,6 +396,7 @@ class MutasiController extends Controller
     {
         $validated = $request->validate([
             'kode_mutasi' => 'required',
+            'penerima' => 'nullable',
         ], [
             'kode_mutasi.required' => 'Nomor Transaksi Harus di isi',
         ]);
@@ -423,8 +427,13 @@ class MutasiController extends Controller
                     $stk->update(['jumlah_k' => $sisa]);
                 }
             }
-
-            $mutasi->update(['status' => '3']);
+            $user = Auth::user();
+            $penerima = $validated['penerima']  ?? $user->kode;
+            $mutasi->update([
+                'status' => '3',
+                'penerima' => $penerima,
+                'tgl_terima' => Carbon::now()->format('Y-m-d H:i:s')
+            ]);
             DB::commit();
             $mutasi->load([
                 'rinci' => function ($q) use ($profile) {
