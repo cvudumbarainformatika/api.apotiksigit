@@ -42,7 +42,7 @@ class KategoriController extends Controller
         // return new JsonResponse($request->all());
         $kode = $request->kode;
         $validated = $request->validate([
-            'nama' => 'required',
+            'nama' => 'required|unique:kategoris,nama',
             'kode' => 'nullable',
         ], [
             'nama.required' => 'Nama wajib diisi.'
