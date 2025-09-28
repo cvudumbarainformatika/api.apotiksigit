@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('kode_barang');
             $table->decimal('jumlah', 20, 2)->default(0);
             $table->decimal('distribusi', 20, 2)->default(0);
+            $table->decimal('harga_beli', 20, 2)->default(0);
             $table->timestamps();
         });
     }
