@@ -6,6 +6,7 @@ use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Master\Barang;
+use App\Models\Setting\ProfileToko;
 use App\Models\Transactions\PenjualanH;
 use App\Models\Transactions\PenjualanR;
 use App\Models\Transactions\Stok;
@@ -28,15 +29,15 @@ class PenjualanController extends Controller
             'per_page' => request('per_page') ?? 10,
         ];
         $limitHargaTertinggi = 5;
-
+        $profile = ProfileToko::first();
         // tambah penjualan yang belum selesai -- ibarat alokasi... maping di front
         $data = Barang::when(request('q'), function ($q) {
             $q->where('nama', 'like', '%' . request('q') . '%')
                 ->orWhere('kode', 'like', '%' . request('q') . '%');
         })
             ->with([
-                'stok' => function ($q) {
-                    $q->where('jumlah_k', '>', 0);
+                'stok' => function ($q) use ($profile) {
+                    $q->where('kode_depo', $profile->kode_toko);
                 },
                 'penjualanRinci' => function ($q) {
                     $q->select(
@@ -49,43 +50,43 @@ class PenjualanController extends Controller
                         ->groupBy('kode_barang', 'id_stok');
                 }
             ])
-            ->addSelect([
-                'harga_tertinggi_ids' => Stok::query()
-                    ->selectRaw("
-                SUBSTRING_INDEX(
-                    GROUP_CONCAT(stoks.id ORDER BY stoks.id DESC SEPARATOR ','),
-                    ',',
-                    {$limitHargaTertinggi}
-                )
-            ")
-                    ->whereColumn('stoks.kode_barang', '=', 'barangs.kode')
-            ])
+            // ->addSelect([
+            //     'harga_tertinggi_ids' => Stok::query()
+            //         ->selectRaw("
+            //     SUBSTRING_INDEX(
+            //         GROUP_CONCAT(stoks.id ORDER BY stoks.id DESC SEPARATOR ','),
+            //         ',',
+            //         {$limitHargaTertinggi}
+            //     )
+            // ")
+            //         ->whereColumn('stoks.kode_barang', '=', 'barangs.kode')
+            // ])
             ->orderBy($req['order_by'], $req['sort'])
             ->limit($req['per_page'])
             ->get();
 
-        $stokIds = $data->pluck('harga_tertinggi_ids')
-            ->filter() // buang null
-            ->map(fn($ids) => explode(',', $ids))
-            ->flatten();
+        // $stokIds = $data->pluck('harga_tertinggi_ids')
+        //     ->filter() // buang null
+        //     ->map(fn($ids) => explode(',', $ids))
+        //     ->flatten();
 
-        $stokHargaTertinggi = Stok::select('id', 'kode_barang', 'harga_total')
-            ->whereIn('id', $stokIds)
-            ->get();
-        foreach ($data as $barang) {
-            $ids = $barang->harga_tertinggi_ids ? explode(',', $barang->harga_tertinggi_ids) : [];
+        // $stokHargaTertinggi = Stok::select('id', 'kode_barang', 'harga_total')
+        //     ->whereIn('id', $stokIds)
+        //     ->get();
+        // foreach ($data as $barang) {
+        //     $ids = $barang->harga_tertinggi_ids ? explode(',', $barang->harga_tertinggi_ids) : [];
 
-            $barangHargaTertinggi = $stokHargaTertinggi
-                ->whereIn('id', $ids)
-                ->sortBy(fn($row) => array_flip($ids)[$row->id])
-                ->values();
+        //     $barangHargaTertinggi = $stokHargaTertinggi
+        //         ->whereIn('id', $ids)
+        //         ->sortBy(fn($row) => array_flip($ids)[$row->id])
+        //         ->values();
 
-            // set relasi semu "harga_tertinggi"
-            // $barang->setRelation('harga_tertinggi', $barangHargaTertinggi);
+        //     // set relasi semu "harga_tertinggi"
+        //     // $barang->setRelation('harga_tertinggi', $barangHargaTertinggi);
 
-            // langsung hitung max harga_total
-            $barang->hpp = $barangHargaTertinggi->max('harga_total');
-        }
+        //     // langsung hitung max harga_total
+        //     $barang->hpp = $barangHargaTertinggi->max('harga_total');
+        // }
         return new JsonResponse([
             'data' => $data
         ]);
@@ -139,10 +140,10 @@ class PenjualanController extends Controller
             'harga_beli' => 'required', // ini dari master
             // 'hpp' => 'required', // ini di taruh di master, hasil query dari 5 harga terakhir
             'hpp' => 'nullable', // ini di taruh di master, hasil query dari 5 harga terakhir
-            'id_penerimaan_rinci' => 'required', // ini dari stok
-            'nopenerimaan' => 'required', // ini dari stok
-            'nobatch' => 'required', // ini dari stok
-            'tgl_exprd' => 'required', // ini dari stok
+            // 'id_penerimaan_rinci' => 'required', // ini dari stok
+            // 'nopenerimaan' => 'required', // ini dari stok
+            // 'nobatch' => 'required', // ini dari stok
+            // 'tgl_exprd' => 'required', // ini dari stok
             'id_stok' => 'required', // ini dari stok
         ], [
             'kode_barang.required' => 'Kode Barang Harus Di isi.',
@@ -150,10 +151,10 @@ class PenjualanController extends Controller
             'isi.required' => 'Isi per Satuan Besar Barang Harus Di isi.',
             'harga_jual.required' => 'Harga Jual Harus Di isi.',
             'harga_beli.required' => 'Harga Beli Harus Di isi.',
-            'id_penerimaan_rinci.required' => 'id Rincian Penerimaan belum di ikutkan, silahkan kontak penyedia IT',
-            'nopenerimaan.required' => 'Nomor Penerimaan belum di ikutkan, silahkan kontak penyedia IT',
-            'nobatch.required' => 'Nomor Batch belum di ikutkan, silahkan kontak penyedia IT',
-            'tgl_exprd.required' => 'Tanggal Expired Obat di ikutkan, silahkan kontak penyedia IT',
+            // 'id_penerimaan_rinci.required' => 'id Rincian Penerimaan belum di ikutkan, silahkan kontak penyedia IT',
+            // 'nopenerimaan.required' => 'Nomor Penerimaan belum di ikutkan, silahkan kontak penyedia IT',
+            // 'nobatch.required' => 'Nomor Batch belum di ikutkan, silahkan kontak penyedia IT',
+            // 'tgl_exprd.required' => 'Tanggal Expired Obat di ikutkan, silahkan kontak penyedia IT',
             'id_stok.required' => 'id Stok belum di ikutkan, silahkan kontak penyedia IT',
             // 'hpp.required' => 'HPP belum di ikutkan, silahkan kontak penyedia IT',
         ]);
@@ -184,17 +185,17 @@ class PenjualanController extends Controller
             $rinci = PenjualanR::updateOrCreate([
                 'nopenjualan' => $nopenjualan,
                 'kode_barang' => $validated['kode_barang'],
-                'id_penerimaan_rinci' => $validated['id_penerimaan_rinci'],
+                'id_penerimaan_rinci' => '',
                 'id_stok' => $validated['id_stok'],
                 'jumlah_k' => $validated['jumlah_k'],
             ], [
                 'jumlah_b' => $jumlahB,
-                'nopenerimaan' => $validated['nopenerimaan'],
-                'nobatch' => $validated['nobatch'],
+                'nopenerimaan' => '',
+                'nobatch' => '',
                 'isi' => $validated['isi'],
                 'satuan_k' => $validated['satuan_k'],
                 'satuan_b' => $validated['satuan_b'],
-                'tgl_exprd' => $validated['tgl_exprd'],
+                'tgl_exprd' => null,
                 'harga_jual' => $validated['harga_jual'],
                 'harga_beli' => $validated['harga_beli'],
                 'hpp' => $validated['hpp'] ?? $validated['harga_beli'],

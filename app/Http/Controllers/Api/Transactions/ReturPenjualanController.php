@@ -121,28 +121,28 @@ class ReturPenjualanController extends Controller
 
             'tgl_retur' => 'nullable',
             'nopenjualan' => 'required',
-            'nopenerimaan' => 'required',
+            // 'nopenerimaan' => 'required',
             'kode_barang' => 'required',
-            'nobatch' => 'required',
+            // 'nobatch' => 'required',
             'jumlah_k' => 'required',
             'satuan_k' => 'required',
             'harga' => 'required',
             'harga_beli' => 'required',
             'hpp' => 'required',
             'id_stok' => 'required',
-            'id_penerimaan_rinci' => 'required',
+            // 'id_penerimaan_rinci' => 'required',
         ], [
             'nopenjualan.required' => 'Nomor Penerimaan harus diisi.',
-            'nopenerimaan.required' => 'Nomor Faktur harus diisi.',
+            // 'nopenerimaan.required' => 'Nomor Faktur harus diisi.',
             'kode_barang.required' => 'Kode Barang harus diisi.',
-            'nobatch.required' => 'Nomor Batch harus diisi.',
+            // 'nobatch.required' => 'Nomor Batch harus diisi.',
             'jumlah_k.required' => 'Jumlah harus diisi.',
             'satuan_k.required' => 'Satuan harus diisi.',
             'harga.required' => 'Harga harus diisi.',
             'harga_beli.required' => 'Harga Beli harus diisi.',
             'hpp.required' => 'HPP harus diisi.',
             'id_stok.required' => 'id stok harus diisi.',
-            'id_penerimaan_rinci.required' => 'id rinci penerimaan harus diisi.',
+            // 'id_penerimaan_rinci.required' => 'id rinci penerimaan harus diisi.',
         ]);
 
         $user = Auth::user();
@@ -197,14 +197,14 @@ class ReturPenjualanController extends Controller
                     'nopenjualan' => $validated['nopenjualan'],
                 ],
                 [
-                    'nobatch' => $validated['nobatch'],
+                    'nobatch' => '',
                     'jumlah_k' => $validated['jumlah_k'],
                     'satuan_k' => $validated['satuan_k'],
                     'harga' => $validated['harga'],
                     'harga_beli' => $validated['harga_beli'],
                     'hpp' => $validated['hpp'],
-                    'id_penerimaan_rinci' => $validated['id_penerimaan_rinci'],
-                    'nopenerimaan' => $validated['nopenerimaan'],
+                    'id_penerimaan_rinci' => '',
+                    'nopenerimaan' => '',
                     'id_stok' => $validated['id_stok'],
                     'kode_user' => $user->kode
                 ]
