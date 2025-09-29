@@ -24,7 +24,7 @@ class BebanController extends Controller
 
         $raw->when(request('q'), function ($q) {
             $q->where(function ($query) {
-                $query->where('nama_beban', 'like', '%' . request('q') . '%');
+                $query->where('nama', 'like', '%' . request('q') . '%');
             });
         })->where('flag', '')
             ->orderBy($req['order_by'], $req['sort']);
