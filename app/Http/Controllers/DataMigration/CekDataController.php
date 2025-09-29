@@ -30,6 +30,7 @@ use App\Models\OldApp\Master\SatuanBesar;
 use App\Models\OldApp\Master\Supplier as MasterSupplier;
 use App\Models\Setting\ProfileToko;
 use App\Models\Transactions\Stok;
+use App\Models\Transactions\StokOpname;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -813,23 +814,56 @@ class CekDataController extends Controller
             $kode = $product->pluck('kode_produk');
             $barang = Barang::whereIn('kode', $kode)->get();
             $stok = Stok::whereIn('kode_barang', $kode)->get();
+            $opname = StokOpname::whereIn('kode_barang', $kode)->get();
             $profile = ProfileToko::first();
+            $stokToIns = [];
+            $stokOpnameToIns = [];
+            $created = Carbon::now()->format('Y-m-d H:i:s');
+            $endOfLastMonth = Carbon::now()->subMonth(1)->endOfMonth()->toDateString() . ' 23:59:59';
+
             foreach ($product as $key) {
                 if ($key['stok'] != 0) {
                     $dataStok = $stok->firstWhere('kode_barang', $key['kode_produk']);
+                    $dataOpname = $opname->firstWhere('kode_barang', $key['kode_produk']);
                     $dataBarang = $barang->firstWhere('kode', $key['kode_produk']);
                     if ($dataStok) {
                         $jum = $key['stok'];
                         $dataStok->update(['jumlah_k' => $jum]);
                     } else {
-                        Stok::create([
+                        $stokToIns[] = [
                             'kode_depo' => $profile->kode_toko,
                             'kode_barang' => $key['kode_produk'],
                             'satuan_k' => $dataBarang['satuan_k'],
                             'jumlah_k' => $key['stok'],
-                        ]);
+                            'created_at' => $created,
+                            'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+                        ];
+                    }
+                    if ($dataOpname) {
+                        $jum = $key['stok'];
+                        $dataOpname->update(['jumlah_k' => $jum]);
+                    } else {
+                        $stokOpnameToIns[] = [
+                            'kode_depo' => $profile->kode_toko,
+                            'kode_barang' => $key['kode_produk'],
+                            'satuan_k' => $dataBarang['satuan_k'],
+                            'jumlah_k' => $key['stok'],
+                            'tgl_opname' => $endOfLastMonth,
+                            'created_at' => $created,
+                            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                        ];
                     }
                 }
+            }
+            if (count($stokToIns) > 0) {
+                collect($stokToIns)->chunk(1000)->each(function ($chunk) {
+                    Stok::insert($chunk->toArray());
+                });
+            }
+            if (count($stokOpnameToIns) > 0) {
+                collect($stokOpnameToIns)->chunk(1000)->each(function ($chunk) {
+                    StokOpname::insert($chunk->toArray());
+                });
             }
             DB::commit();
             return [

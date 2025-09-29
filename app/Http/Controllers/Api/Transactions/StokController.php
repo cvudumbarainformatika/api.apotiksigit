@@ -74,7 +74,7 @@ class StokController extends Controller
                 'tgl_penyesuaian' => Carbon::now()->format('Y-m-d H:i:s'),
                 'keterangan' => $validated['keterangan'],
                 'id_stok' => $validated['id_stok'],
-                'id_penerimaan_rinci' => $stok->id_penerimaan_rinci,
+                'id_penerimaan_rinci' => '',
                 'satuan_k' => $validated['satuan_k'],
                 'jumlah_k' => $validated['jumlah'],
                 'jumlah_sebelum' => $sebelum,
@@ -105,6 +105,7 @@ class StokController extends Controller
             'per_page' => request('per_page', 10),
             'bulan' => request('bulan') ?? Carbon::now()->month,
             'tahun' => request('tahun') ?? Carbon::now()->year,
+            'depo' => !!request('depo') && request('depo') != 'gudang' ? request('depo') : 'APS0000'
         ];
         $target = Carbon::create($req['tahun'], $req['bulan'], 1);
         $now = $target->copy()->startOfMonth();
@@ -126,30 +127,16 @@ class StokController extends Controller
                 ->orWhere('kode', 'like', '%' . request('q') . '%');
         })
             ->with([
-                'stokAwal' => function ($q) use ($lastMonth) {
-                    $q->select(
-                        'kode_barang',
-                        DB::raw('sum(jumlah_k) as jumlah_k'),
-                    )
-                        ->where('jumlah_k', '>', 0)
-                        ->whereDate('tgl_opname', $lastMonth)
-                        ->groupBy('kode_barang');
+                'stokAwal' => function ($q) use ($lastMonth, $req) {
+                    $q->whereDate('tgl_opname', $lastMonth)
+                        ->where('kode_depo', $req['depo'])
+                    ;
                 },
-                'stok' => function ($q) {
-                    $q->select(
-                        'kode_barang',
-                        DB::raw('sum(jumlah_k) as jumlah_k'),
-                    )
-                        ->where('jumlah_k', '>', 0)
-                        ->groupBy('kode_barang');
+                'stoks' => function ($q) use ($req) {
+                    $q->where('kode_depo', $req['depo']);
                 },
                 'penyesuaian' => function ($q) use ($awalBulan, $akhirBulan) {
-                    $q->select(
-                        'kode_barang',
-                        DB::raw('sum(jumlah_k) as jumlah_k'),
-                    )
-                        ->whereBetween('tgl_penyesuaian', [$awalBulan, $akhirBulan])
-                        ->groupBy('kode_barang');
+                    $q->whereBetween('tgl_penyesuaian', [$awalBulan, $akhirBulan]);
                 },
                 'penjualanRinci' => function ($q) use ($awalBulan, $akhirBulan) {
                     $q->select(

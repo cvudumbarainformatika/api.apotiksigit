@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Transactions;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Master\Barang;
+use App\Models\Setting\ProfileToko;
 use App\Models\Transactions\StokOpname;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -79,7 +80,8 @@ class StokOpnameController extends Controller
                 'stok',
                 'stokAwal' => function ($q) use ($tglOpnameTerakhir) {
                     $q->when($tglOpnameTerakhir, function ($y) use ($tglOpnameTerakhir) {
-                        $y->whereDate('tgl_opname', $tglOpnameTerakhir);
+                        $tgl = Carbon::create($tglOpnameTerakhir)->toDateString();
+                        $y->whereDate('tgl_opname', $tgl);
                     });
                 },
                 'penerimaanRinci' => function ($q) use ($tglOpnameTerakhir, $akhirBulanLalu) {
@@ -107,7 +109,7 @@ class StokOpnameController extends Controller
                 },
                 'penjualanRinci' => function ($q) use ($tglOpnameTerakhir, $akhirBulanLalu) {
                     $q->select(
-                        'penjualan_r_s.id_penerimaan_rinci',
+                        // 'penjualan_r_s.id_penerimaan_rinci',
                         'penjualan_r_s.kode_barang',
                         'penjualan_r_s.nopenerimaan',
                         'penjualan_r_s.jumlah_k',
@@ -123,7 +125,7 @@ class StokOpnameController extends Controller
                 },
                 'returPenjualanRinci' => function ($q) use ($tglOpnameTerakhir, $akhirBulanLalu) {
                     $q->select(
-                        'retur_penjualan_rs.id_penerimaan_rinci',
+                        // 'retur_penjualan_rs.id_penerimaan_rinci',
                         'retur_penjualan_rs.kode_barang',
                         'retur_penjualan_rs.nopenerimaan',
                         'retur_penjualan_rs.jumlah_k',
@@ -139,7 +141,7 @@ class StokOpnameController extends Controller
                 },
                 'returPembelianRinci' => function ($q) use ($tglOpnameTerakhir, $akhirBulanLalu) {
                     $q->select(
-                        'retur_pembelian_rs.id_penerimaan_rinci',
+                        // 'retur_pembelian_rs.id_penerimaan_rinci',
                         'retur_pembelian_rs.kode_barang',
                         'retur_pembelian_rs.jumlah_k',
                         'retur_pembelian_rs.harga',
@@ -154,7 +156,7 @@ class StokOpnameController extends Controller
                 },
                 'penyesuaian' => function ($q) use ($tglOpnameTerakhir, $akhirBulanLalu) {
                     $q->select(
-                        'id_penerimaan_rinci',
+                        'id_stok',
                         'kode_barang',
                         'jumlah_k',
                     )
@@ -164,60 +166,144 @@ class StokOpnameController extends Controller
                             $y->whereDate('tgl_penyesuaian', '<=', $akhirBulanLalu);
                         });
                 },
+                'mutasiMasuk' => function ($q) use ($tglOpnameTerakhir, $akhirBulanLalu) {
+                    $q->select(
+                        'mutasi_requests.kode_barang',
+                        'mutasi_requests.jumlah',
+                        'mutasi_requests.distribusi',
+                        'mutasi_headers.dari',
+                        'mutasi_headers.tujuan',
+                    )
+                        ->leftJoin('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
+                        ->when($tglOpnameTerakhir, function ($y) use ($tglOpnameTerakhir, $akhirBulanLalu) {
+                            $y->whereBetween('mutasi_headers.tgl_terima',  [$tglOpnameTerakhir, $akhirBulanLalu]);
+                        }, function ($y) use ($akhirBulanLalu) {
+                            $y->whereDate('mutasi_headers.tgl_terima', '<=', $akhirBulanLalu);
+                        })
+                        ->whereNotNull('mutasi_headers.flag');
+                },
+                'mutasiKeluar' => function ($q) use ($tglOpnameTerakhir, $akhirBulanLalu) {
+                    $q->select(
+                        'mutasi_requests.kode_barang',
+                        'mutasi_requests.jumlah',
+                        'mutasi_requests.distribusi',
+                        'mutasi_headers.dari',
+                        'mutasi_headers.tujuan',
+                    )
+                        ->leftJoin('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
+                        ->when($tglOpnameTerakhir, function ($y) use ($tglOpnameTerakhir, $akhirBulanLalu) {
+                            $y->whereBetween('mutasi_headers.tgl_distribusi',  [$tglOpnameTerakhir, $akhirBulanLalu]);
+                        }, function ($y) use ($akhirBulanLalu) {
+                            $y->whereDate('mutasi_headers.tgl_distribusi', '<=', $akhirBulanLalu);
+                        })
+                        ->whereNotNull('mutasi_headers.flag');
+                }
             ])
             ->get();
+        // old
+        // foreach ($barang as $key) {
+        //     $idr = [];
+        //     $idrStokAwal = $key->stokAwal->pluck('id_penerimaan_rinci')->toArray();
+        //     $idrPenerimaan = $key->penerimaanRinci->pluck('id')->toArray();
+        //     $idrPenjualan = $key->penjualanRinci->pluck('id_penerimaan_rinci')->toArray();
+        //     $idrReturPenjualan = $key->returPenjualanRinci->whereNotNull('id_penerimaan_rinci')->pluck('id_penerimaan_rinci')->toArray();
+        //     $idrReturPembelian = $key->returPembelianRinci->whereNotNull('id_penerimaan_rinci')->pluck('id_penerimaan_rinci')->toArray();
+        //     $idrPenyesu = $key->penyesuaian->whereNotNull('id_penerimaan_rinci')->pluck('id_penerimaan_rinci')->toArray();
 
+        //     $uniIdr = array_unique(array_merge($idr, $idrPenerimaan, $idrStokAwal, $idrPenjualan, $idrReturPenjualan, $idrReturPembelian, $idrPenyesu));
+        //     // tiap2 id Penerimaan, cari yang masih ada stok
+        //     foreach ($uniIdr as $idRinc) {
+        //         $stokAwal = $key->stokAwal ? $key->stokAwal->where('id_penerimaan_rinci', $idRinc)->sum('jumlah_k') : 0;
+        //         $penerimaan = $key->penerimaanRinci ? $key->penerimaanRinci->where('id', $idRinc)->sum('jumlah_k') : 0;
+        //         $penjualan = $key->penjualanRinci ? $key->penjualanRinci->where('id_penerimaan_rinci', $idRinc)->sum('jumlah_k') : 0;
+        //         $returPenjualan = $key->returPenjualanRinci ? $key->returPenjualanRinci->where('id_penerimaan_rinci', $idRinc)->sum('jumlah_k') : 0;
+        //         $returPembelian = $key->returPembelianRinci ? $key->returPembelianRinci->where('id_penerimaan_rinci', $idRinc)->sum('jumlah_k') : 0;
+        //         $penyesuaian = $key->idrPenyesu ? $key->idrPenyesu->where('id_penerimaan_rinci', $idRinc)->sum('jumlah_k') : 0;
+        //         $stok = $key->stok->where('id_penerimaan_rinci', $idRinc)->first();
+        //         $sisa = (int)$stokAwal + (int)$penerimaan + (int)$returPenjualan + (int)$penyesuaian - (int)$penjualan - (int)$returPembelian;
+        //         if ($stok && $sisa > 0) {
+
+        //             $data[] = [
+        //                 'nopenerimaan' => $stok->nopenerimaan,
+        //                 'noorder' => $stok->noorder,
+        //                 'kode_barang' => $stok->kode_barang,
+        //                 'nobatch' => $stok->nobatch,
+        //                 'id_penerimaan_rinci' => $stok->id_penerimaan_rinci,
+        //                 'isi' => $stok->isi,
+        //                 'satuan_b' => $stok->satuan_b,
+        //                 'satuan_k' => $stok->satuan_k,
+        //                 'jumlah_b' => $stok->jumlah_b,
+        //                 'jumlah_k' => $sisa,
+        //                 'harga' => $stok->harga,
+        //                 'pajak_rupiah' => $stok->pajak_rupiah,
+        //                 'diskon_persen' => $stok->diskon_persen,
+        //                 'diskon_rupiah' => $stok->diskon_rupiah,
+        //                 'harga_total' => $stok->harga_total,
+        //                 'subtotal' => $stok->subtotal,
+        //                 'tgl_exprd' => $stok->tgl_exprd,
+        //                 'tgl_opname' => $akhirBulanLalu,
+        //                 'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        //                 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        //             ];
+        //         }
+        //     }
+        // }
+        // new opname
+        $profile = ProfileToko::first();
         foreach ($barang as $key) {
-            $idr = [];
-            $idrStokAwal = $key->stokAwal->pluck('id_penerimaan_rinci')->toArray();
-            $idrPenerimaan = $key->penerimaanRinci->pluck('id')->toArray();
-            $idrPenjualan = $key->penjualanRinci->pluck('id_penerimaan_rinci')->toArray();
-            $idrReturPenjualan = $key->returPenjualanRinci->whereNotNull('id_penerimaan_rinci')->pluck('id_penerimaan_rinci')->toArray();
-            $idrReturPembelian = $key->returPembelianRinci->whereNotNull('id_penerimaan_rinci')->pluck('id_penerimaan_rinci')->toArray();
-            $idrPenyesu = $key->penyesuaian->whereNotNull('id_penerimaan_rinci')->pluck('id_penerimaan_rinci')->toArray();
+            // dibedakan antara gudang dan depo
+            // gudang
+            $stok = $key->stok->firstWhere('kode_depo', 'APS0000');
+            $stokAwalGud = $key->stokAwal ? $key->stokAwal->where('kode_depo', 'APS0000')->sum('jumlah_k') : 0;
+            $penerimaan = $key->penerimaanRinci ? $key->penerimaanRinci->sum('jumlah_k') : 0;
+            $returPembelian = $key->returPembelianRinci ? $key->returPembelianRinci->sum('jumlah_k') : 0;
+            $mutasiMasuk = $key->mutasiMasuk ? $key->mutasiMasuk->where('dari', 'APS0000')->sum('jumlah_k') : 0;
+            $mutasiKeluar = $key->mutasiMasuk ? $key->mutasiMasuk->where('tujuan', 'APS0000')->sum('jumlah_k') : 0;
+            $penyesuaian = $key->penyesuaian ? $key->penyesuaian->where('id_stok', $stok->id)->sum('jumlah_k') : 0;
+            $sisa = (int)$stokAwalGud + (int)$penerimaan + (int)$mutasiMasuk + (int)$penyesuaian - (int)$mutasiKeluar - (int)$returPembelian;
+            if ($stok && $sisa > 0) {
+                $data[] = [
+                    'kode_depo' => 'APS0000',
+                    'kode_barang' => $stok->kode_barang,
+                    'isi' => $stok->isi,
+                    'satuan_k' => $stok->satuan_k,
+                    'jumlah_k' => $sisa,
+                    'tgl_opname' => $akhirBulanLalu,
+                    'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                    'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                ];
+            }
+            // depo
+            $depo = $profile->kode_toko;
+            $stok = $key->stok->firstWhere('kode_depo', $depo);
+            $stokAwal = $key->stokAwal ? $key->stokAwal->where('kode_depo', $depo)->sum('jumlah_k') : 0;
+            $penjualan = $key->penjualanRinci ? $key->penjualanRinci->sum('jumlah_k') : 0;
+            $returPenjualan = $key->returPenjualanRinci ? $key->returPenjualanRinci->sum('jumlah_k') : 0;
+            $mutasiMasuk = $key->mutasiMasuk ? $key->mutasiMasuk->where('dari', 'APS0000')->sum('jumlah_k') : 0;
+            $mutasiKeluar = $key->mutasiMasuk ? $key->mutasiMasuk->where('tujuan', 'APS0000')->sum('jumlah_k') : 0;
 
-            $uniIdr = array_unique(array_merge($idr, $idrPenerimaan, $idrStokAwal, $idrPenjualan, $idrReturPenjualan, $idrReturPembelian, $idrPenyesu));
-            // tiap2 id Penerimaan, cari yang masih ada stok
-            foreach ($uniIdr as $idRinc) {
-                $stokAwal = $key->stokAwal ? $key->stokAwal->where('id_penerimaan_rinci', $idRinc)->sum('jumlah_k') : 0;
-                $penerimaan = $key->penerimaanRinci ? $key->penerimaanRinci->where('id', $idRinc)->sum('jumlah_k') : 0;
-                $penjualan = $key->penjualanRinci ? $key->penjualanRinci->where('id_penerimaan_rinci', $idRinc)->sum('jumlah_k') : 0;
-                $returPenjualan = $key->returPenjualanRinci ? $key->returPenjualanRinci->where('id_penerimaan_rinci', $idRinc)->sum('jumlah_k') : 0;
-                $returPembelian = $key->returPembelianRinci ? $key->returPembelianRinci->where('id_penerimaan_rinci', $idRinc)->sum('jumlah_k') : 0;
-                $penyesuaian = $key->idrPenyesu ? $key->idrPenyesu->where('id_penerimaan_rinci', $idRinc)->sum('jumlah_k') : 0;
-                $stok = $key->stok->where('id_penerimaan_rinci', $idRinc)->first();
-                $sisa = (int)$stokAwal + (int)$penerimaan + (int)$returPenjualan + (int)$penyesuaian - (int)$penjualan - (int)$returPembelian;
-                if ($stok && $sisa > 0) {
-
-                    $data[] = [
-                        'nopenerimaan' => $stok->nopenerimaan,
-                        'noorder' => $stok->noorder,
-                        'kode_barang' => $stok->kode_barang,
-                        'nobatch' => $stok->nobatch,
-                        'id_penerimaan_rinci' => $stok->id_penerimaan_rinci,
-                        'isi' => $stok->isi,
-                        'satuan_b' => $stok->satuan_b,
-                        'satuan_k' => $stok->satuan_k,
-                        'jumlah_b' => $stok->jumlah_b,
-                        'jumlah_k' => $sisa,
-                        'harga' => $stok->harga,
-                        'pajak_rupiah' => $stok->pajak_rupiah,
-                        'diskon_persen' => $stok->diskon_persen,
-                        'diskon_rupiah' => $stok->diskon_rupiah,
-                        'harga_total' => $stok->harga_total,
-                        'subtotal' => $stok->subtotal,
-                        'tgl_exprd' => $stok->tgl_exprd,
-                        'tgl_opname' => $akhirBulanLalu,
-                        'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                        'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                    ];
-                }
+            $penyesuaian = $key->penyesuaian ? $key->penyesuaian->where('id_stok', $stok->id)->sum('jumlah_k') : 0;
+            $sisa = (int)$stokAwal + (int)$penerimaan + (int)$returPenjualan + (int)$penyesuaian - (int)$penjualan - (int)$returPembelian;
+            if ($stok && $sisa > 0) {
+                $data[] = [
+                    'kode_depo' => $depo,
+                    'kode_barang' => $stok->kode_barang,
+                    'isi' => $stok->isi,
+                    'satuan_k' => $stok->satuan_k,
+                    'jumlah_k' => $sisa,
+                    'tgl_opname' => $akhirBulanLalu,
+                    'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                    'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                ];
             }
         }
         if (count($data) <= 0) {
             return new JsonResponse(['message' => 'Tidak ada Data untuk di simpan. apakah ada transaksi di bulan tersebut?'], 410);
         }
-        $hasil = StokOpname::insert($data);
+        $hasil = collect($data)->chunk(1000)->each(function ($chunk) {
+            StokOpname::insert($chunk->toArray());
+        });
+        // $hasil = StokOpname::insert($data);
         return new JsonResponse([
             'hasil' => $hasil ?? null,
             'data' => $data ?? null,

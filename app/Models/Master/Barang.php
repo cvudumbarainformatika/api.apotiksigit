@@ -2,6 +2,7 @@
 
 namespace App\Models\Master;
 
+use App\Models\Transactions\MutasiRequest;
 use App\Models\Transactions\Penerimaan_r;
 use App\Models\Transactions\PenjualanR;
 use App\Models\Transactions\Penyesuaian;
@@ -37,6 +38,10 @@ class Barang extends Model
     }
     public function stok()
     {
+        return $this->hasOne(Stok::class, 'kode_barang', 'kode');
+    }
+    public function stoks()
+    {
         return $this->hasMany(Stok::class, 'kode_barang', 'kode');
     }
     public function stokOpname()
@@ -50,5 +55,13 @@ class Barang extends Model
     public function returPembelianRinci()
     {
         return $this->hasMany(ReturPembelian_r::class, 'kode_barang', 'kode');
+    }
+    public function mutasiMasuk()
+    {
+        return $this->hasMany(MutasiRequest::class, 'kode_barang', 'kode');
+    }
+    public function mutasiKeluar()
+    {
+        return $this->hasMany(MutasiRequest::class, 'kode_barang', 'kode');
     }
 }
