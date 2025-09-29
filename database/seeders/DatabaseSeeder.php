@@ -83,13 +83,49 @@ class DatabaseSeeder extends Seeder
         );
         $master->children()->updateOrCreate(
             [
-                'title' => 'Master Barang',
+                'title' => 'Master Merk',
+            ],
+            [
+                'icon' => 'tag',
+                'url' => 'admin/master/merk',
+                'name' => 'master.merk',
+                'view' => '/views/master/merk',
+                'component' => 'IndexPage',
+            ]
+        );
+        $master->children()->updateOrCreate(
+            [
+                'title' => 'Master Rak',
+            ],
+            [
+                'icon' => 'tag',
+                'url' => 'admin/master/rak',
+                'name' => 'master.rak',
+                'view' => '/views/master/rak',
+                'component' => 'IndexPage',
+            ]
+        );
+        $master->children()->updateOrCreate(
+            [
+                'title' => 'Master Rak',
+            ],
+            [
+                'icon' => 'tag',
+                'url' => 'admin/master/rak',
+                'name' => 'master.rak',
+                'view' => '/views/master/rak',
+                'component' => 'IndexPage',
+            ]
+        );
+        $master->children()->updateOrCreate(
+            [
+                'title' => 'Master Kategori',
             ],
             [
                 'icon' => 'layers',
-                'url' => 'admin/master/barang',
-                'name' => 'master.barang',
-                'view' => '/views/master/barang',
+                'url' => 'admin/master/kategori',
+                'name' => 'master.kategori',
+                'view' => '/views/master/kategori',
                 'component' => 'IndexPage',
             ]
         );
