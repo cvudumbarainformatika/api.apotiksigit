@@ -278,10 +278,10 @@ class PenjualanController extends Controller
             foreach ($rincian as $rinci) {
                 $stok = Stok::find($rinci->id_stok);
                 // validasi sisa stok agar tidak minus
-                if ((int)$stok->jumlah_k < (int)$rinci->jumlah_k) {
-                    $nama = Barang::where('kode', $rinci->kode_barang)->first();
-                    throw new Exception('Stok ' . $nama->nama . ' tgl expired ' . $stok->tgl_exprd . ' kurang, sisa stok sejumlah ' . (int)$stok->jumlah_k);
-                }
+                // if ((int)$stok->jumlah_k < (int)$rinci->jumlah_k) {
+                //     $nama = Barang::where('kode', $rinci->kode_barang)->first();
+                //     throw new Exception('Stok ' . $nama->nama . ' tgl expired ' . $stok->tgl_exprd . ' kurang, sisa stok sejumlah ' . (int)$stok->jumlah_k);
+                // }
                 $jumlah = (int)$stok->jumlah_k - (int)$rinci->jumlah_k;
                 $stok->update([
                     'jumlah_k' => $jumlah,
