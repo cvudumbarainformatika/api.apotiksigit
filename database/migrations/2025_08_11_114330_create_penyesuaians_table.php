@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('transaksi')->nullable();
             $table->string('keterangan')->nullable();
             $table->bigInteger('id_stok');
-            $table->bigInteger('id_penerimaan_rinci');
+            $table->string('kode_depo');
             $table->decimal('jumlah_k', 20, 0)->default(0);
             $table->string('flag', 2)->nullable();
             $table->timestamps();
