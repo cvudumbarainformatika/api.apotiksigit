@@ -257,8 +257,10 @@ class PenerimaanController extends Controller
     {
         $validated = $request->validate([
             'nopenerimaan' => 'required',
+            'kode_depo' => 'required',
         ], [
             'nopenerimaan.required' => 'No. Penerimaan Harus Di isi.',
+            'kode_depo.required' => 'Kode Depo Harus Di isi.',
         ]);
 
         $existingHeader = Penerimaan_h::where('nopenerimaan', $validated['nopenerimaan'])->first();
@@ -278,8 +280,8 @@ class PenerimaanController extends Controller
         try {
             DB::beginTransaction();
                 $existingHeader->update(['flag' => '1']);
-                $kode_depo = 'APS0001';
-                $user = Auth::user();
+                $kode_depo = $validated['kode_depo'];
+                // $user = Auth::user();
                 $requestData = $request->payload;
                 foreach ($requestData as $key => $value) {
                     $cek = Stok::where('kode_barang', $value['kode_barang'])->count();
