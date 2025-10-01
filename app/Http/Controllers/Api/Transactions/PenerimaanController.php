@@ -278,32 +278,47 @@ class PenerimaanController extends Controller
         try {
             DB::beginTransaction();
                 $existingHeader->update(['flag' => '1']);
-
+                $kode_depo = 'APS0001';
                 $user = Auth::user();
                 $requestData = $request->payload;
                 foreach ($requestData as $key => $value) {
-                Stok::create(
-                        [
-                            'nopenerimaan' => $value['nopenerimaan'],
-                            'noorder' => $value['noorder'],
+                    $cek = Stok::where('kode_barang', $value['kode_barang'])->count();
+                    if ($cek > 0) {
+                        $stok = Stok::where('kode_barang', $value['kode_barang'])->where('kode_depo', $kode_depo)->first();
+                        $stok->update([
+                            'jumlah_b' => $stok->jumlah_b + $value['jumlah_b'],
+                            'jumlah_k' => $stok->jumlah_k + $value['jumlah_k'],
+                        ]);
+                    } else {
+                        $stok = Stok::create([
                             'kode_barang' => $value['kode_barang'],
-                            'nobatch' => $value['nobatch'],
-                            'id_penerimaan_rinci' => $value['id_penerimaan_rinci'],
-                            'isi' => $value['isi'],
-                            'satuan_b' => $value['satuan_b'],
-                            'satuan_k' => $value['satuan_k'],
+                            'kode_depo' => $kode_depo,
                             'jumlah_b' => $value['jumlah_b'],
                             'jumlah_k' => $value['jumlah_k'],
-                            'harga' => $value['harga'],
-                            'pajak_rupiah' => $value['pajak_rupiah'],
-                            'diskon_persen' => $value['diskon_persen'],
-                            'diskon_rupiah' => $value['diskon_rupiah'],
-                            'harga_total' => $value['harga_total'],
-                            'subtotal' => $value['subtotal'],
-                            'tgl_exprd' => $value['tgl_exprd'],
-                            'kode_user' => $user->kode,
-                        ]
-                    );
+                        ]);
+                    }
+                // Stok::create(
+                //         [
+                //             'nopenerimaan' => $value['nopenerimaan'],
+                //             'noorder' => $value['noorder'],
+                //             'kode_barang' => $value['kode_barang'],
+                //             'nobatch' => $value['nobatch'],
+                //             'id_penerimaan_rinci' => $value['id_penerimaan_rinci'],
+                //             'isi' => $value['isi'],
+                //             'satuan_b' => $value['satuan_b'],
+                //             'satuan_k' => $value['satuan_k'],
+                //             'jumlah_b' => $value['jumlah_b'],
+                //             'jumlah_k' => $value['jumlah_k'],
+                //             'harga' => $value['harga'],
+                //             'pajak_rupiah' => $value['pajak_rupiah'],
+                //             'diskon_persen' => $value['diskon_persen'],
+                //             'diskon_rupiah' => $value['diskon_rupiah'],
+                //             'harga_total' => $value['harga_total'],
+                //             'subtotal' => $value['subtotal'],
+                //             'tgl_exprd' => $value['tgl_exprd'],
+                //             'kode_user' => $user->kode,
+                //         ]
+                //     );
                 }
 
                 $existingHeader->load([
