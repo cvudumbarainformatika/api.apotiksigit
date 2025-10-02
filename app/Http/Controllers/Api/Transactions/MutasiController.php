@@ -96,7 +96,9 @@ class MutasiController extends Controller
                             $r->where('kode_depo', 'APS0000');
                         },
                     ]);
-                }
+                },
+                'dari',
+                'tujuan'
             ])
             ->orderBy($req['order_by'], $req['sort']);
         if (request()->has('tujuan')) {
