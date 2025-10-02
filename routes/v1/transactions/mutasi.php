@@ -8,13 +8,13 @@ Route::group([
   'middleware' => 'auth:sanctum',
   'prefix' => 'transactions/mutasi'
 ], function () {
-  Route::get('/get-cabang', [MutasiController::class, 'getCabang']);
-  Route::get('/get-barang', [MutasiController::class, 'getBarang']);
-  Route::get('/get-list', [MutasiController::class, 'index']);
-  Route::post('/simpan', [MutasiController::class, 'simpan']);
-  Route::post('/delete', [MutasiController::class, 'hapus']);
-  Route::post('/kirim', [MutasiController::class, 'kirim']);
-  Route::post('/simpan-distribusi', [MutasiController::class, 'simpanDistribusi']);
-  Route::post('/kirim-distribusi', [MutasiController::class, 'kirimDistribusi']);
-  Route::post('/terima', [MutasiController::class, 'terima']);
+  Route::get('/get-cabang', [MutasiController::class, 'getCabang']); // ambil cabang dari tabel
+  Route::get('/get-barang', [MutasiController::class, 'getBarang']); // ambil barang dan stok
+  Route::get('/get-list', [MutasiController::class, 'index']); // ambil list mutasi. bisa dipilih berdasarkan dari / tujuan.
+  Route::post('/simpan', [MutasiController::class, 'simpan']); // simpan permintaan mutasi oleh depo.
+  Route::post('/delete', [MutasiController::class, 'hapus']); // hapus rincian selama belum di dikirim
+  Route::post('/kirim', [MutasiController::class, 'kirim']); // kirim permintaan dari depo
+  Route::post('/simpan-distribusi', [MutasiController::class, 'simpanDistribusi']); // simpan jumlah barang yang di setujui oleh gudang
+  Route::post('/kirim-distribusi', [MutasiController::class, 'kirimDistribusi']); // kirim balik yang sudah di isi jumlah distribusinya
+  Route::post('/terima', [MutasiController::class, 'terima']); // terima barang yang di distribusi oleh gudang
 });
