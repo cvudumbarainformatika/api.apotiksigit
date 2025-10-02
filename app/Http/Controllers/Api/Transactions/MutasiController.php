@@ -22,7 +22,10 @@ class MutasiController extends Controller
 {
     public function getCabang()
     {
-        $data = Cabang::select('kodecabang', 'namacabang')->get()->toArray();
+        $profile = ProfileToko::first();
+        $data = Cabang::select('kodecabang', 'namacabang')
+            ->where('kodecabang', '!=', $profile->kode_toko)
+            ->get()->toArray();
 
 
         return new JsonResponse([
