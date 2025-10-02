@@ -84,7 +84,12 @@ class MutasiController extends Controller
                     if (request('status') != 'all') $r->where('status', request('status'));
                 }
             )
-            ->where('dari', $profile->kode_toko)
+            ->when(request('dari'), function ($q) {
+                $q->where('dari', request('dari'));
+            })
+            ->when(request('tujuan'), function ($q) {
+                $q->where('tujuan', request('tujuan'));
+            })
             ->with([
                 'rinci' => function ($q) use ($profile) {
                     $q->with([
