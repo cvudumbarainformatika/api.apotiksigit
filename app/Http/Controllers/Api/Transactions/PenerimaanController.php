@@ -257,10 +257,10 @@ class PenerimaanController extends Controller
     {
         $validated = $request->validate([
             'nopenerimaan' => 'required',
-            // 'kode_depo' => 'required',
+            'kode_depo' => 'required',
         ], [
             'nopenerimaan.required' => 'No. Penerimaan Harus Di isi.',
-            // 'kode_depo.required' => 'Kode Depo Harus Di isi.',
+            'kode_depo.required' => 'Kode Depo Harus Di isi.',
         ]);
 
         $existingHeader = Penerimaan_h::where('nopenerimaan', $validated['nopenerimaan'])->first();
@@ -279,26 +279,35 @@ class PenerimaanController extends Controller
 
         try {
             DB::beginTransaction();
-                $existingHeader->update(['flag' => '1']);
-                $kode_depo = '';
+                 Penerimaan_h::where('nopenerimaan', $validated['nopenerimaan'])->update(['flag' => '1']);
                 // $user = Auth::user();
                 $requestData = $request->payload;
                 foreach ($requestData as $key => $value) {
-                    $cek = Stok::where('kode_barang', $value['kode_barang'])->count();
-                    if ($cek > 0) {
-                        $stok = Stok::where('kode_barang', $value['kode_barang'])->where('kode_depo', $kode_depo)->first();
-                        $stok->update([
-                            // 'jumlah_b' => $stok->jumlah_b + $value['jumlah_b'],
-                            'jumlah_k' => $stok->jumlah_k + $value['jumlah_k'],
-                        ]);
-                    } else {
-                        $stok = Stok::create([
+                    Stok::updateOrCreate(
+                        [
                             'kode_barang' => $value['kode_barang'],
-                            'kode_depo' => $kode_depo,
-                            // 'jumlah_b' => $value['jumlah_b'],
-                            'jumlah_k' => $value['jumlah_k'],
-                        ]);
-                    }
+                            'kode_depo' => $value['kode_depo'],
+                        ],
+                        [
+                            'jumlah_k' => DB::raw('COALESCE(jumlah_k, 0) + ' . $value['jumlah_k']),
+                            'satuan_k' => $value['satuan_k'], // default kalau kosong
+                        ]
+                    );
+                    // $cek = Stok::where('kode_barang', $value['kode_barang'])->count();
+                    // if ($cek > 0) {
+                    //     $stok = Stok::where('kode_barang', $value['kode_barang'])->where('kode_depo', $kode_depo)->first();
+                    //     $stok->update([
+                    //         // 'jumlah_b' => $stok->jumlah_b + $value['jumlah_b'],
+                    //         'jumlah_k' => $stok->jumlah_k + $value['jumlah_k'],
+                    //     ]);
+                    // } else {
+                    //     $stok = Stok::create([
+                    //         'kode_barang' => $value['kode_barang'],
+                    //         'kode_depo' => $kode_depo,
+                    //         // 'jumlah_b' => $value['jumlah_b'],
+                    //         'jumlah_k' => $value['jumlah_k'],
+                    //     ]);
+                    // }
                 // Stok::create(
                 //         [
                 //             'nopenerimaan' => $value['nopenerimaan'],
