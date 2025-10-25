@@ -279,14 +279,15 @@ class PenerimaanController extends Controller
 
         try {
             DB::beginTransaction();
-                 Penerimaan_h::where('nopenerimaan', $validated['nopenerimaan'])->update(['flag' => '1']);
+                $existingHeader->update(['flag' => '1']);
+                //  Penerimaan_h::where('nopenerimaan', $validated['nopenerimaan'])->update(['flag' => '1']);
                 // $user = Auth::user();
                 $requestData = $request->payload;
                 foreach ($requestData as $key => $value) {
                     Stok::updateOrCreate(
                         [
                             'kode_barang' => $value['kode_barang'],
-                            'kode_depo' => $value['kode_depo'],
+                            'kode_depo' => $validated['kode_depo'],
                         ],
                         [
                             'jumlah_k' => DB::raw('COALESCE(jumlah_k, 0) + ' . $value['jumlah_k']),
