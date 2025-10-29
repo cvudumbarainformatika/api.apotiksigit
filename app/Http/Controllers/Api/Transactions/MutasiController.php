@@ -272,7 +272,8 @@ class MutasiController extends Controller
                 }
             ]);
             return new JsonResponse([
-                'message' => $mutasi
+                'data' => $mutasi,
+                'message' => 'Permintaan Mutasi Sudah dikirim',
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -330,7 +331,8 @@ class MutasiController extends Controller
                 }
             ]);
             return new JsonResponse([
-                'message' => $data
+                'message' => 'Data sudah disimpan',
+                'data' => $data,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -389,7 +391,8 @@ class MutasiController extends Controller
                 }
             ]);
             return new JsonResponse([
-                'message' => $mutasi
+                'message' => 'Data Distribusi Sudah dikirim',
+                'data' => $mutasi
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -459,7 +462,8 @@ class MutasiController extends Controller
                 }
             ]);
             return new JsonResponse([
-                'message' => $mutasi
+                'message' => 'Mutasi Sudah diterima',
+                'data' => $mutasi,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
