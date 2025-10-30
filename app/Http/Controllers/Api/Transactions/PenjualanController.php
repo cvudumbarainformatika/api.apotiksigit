@@ -135,6 +135,7 @@ class PenjualanController extends Controller
             'jumlah_k' => 'required',
             'satuan_k' => 'nullable',
             'satuan_b' => 'nullable',
+            'diskon' => 'nullable',
             'isi' => 'required',
             'harga_jual' => 'required', // ini dari master
             'harga_beli' => 'required', // ini dari master
@@ -198,6 +199,7 @@ class PenjualanController extends Controller
                 'tgl_exprd' => null,
                 'harga_jual' => $validated['harga_jual'],
                 'harga_beli' => $validated['harga_beli'],
+                'diskon' => $validated['diskon'] ?? 0,
                 'hpp' => $validated['hpp'] ?? $validated['harga_beli'],
                 'subtotal' => $subtotal,
                 'kode_user' => $user->kode,
