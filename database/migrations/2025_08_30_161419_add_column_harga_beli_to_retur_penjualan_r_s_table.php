@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('retur_penjualan_rs', function (Blueprint $table) {
             $table->decimal('harga_beli', 20)->default(0)->after('harga');
+            $table->decimal('diskon', 20)->default(0)->after('harga_beli');
         });
     }
 
@@ -24,6 +25,11 @@ return new class extends Migration
         if (Schema::hasColumn('retur_penjualan_rs', 'harga_beli')) {
             Schema::table('retur_penjualan_rs', function (Blueprint $table) {
                 $table->dropColumn('harga_beli');
+            });
+        }
+        if (Schema::hasColumn('retur_penjualan_rs', 'diskon')) {
+            Schema::table('retur_penjualan_rs', function (Blueprint $table) {
+                $table->dropColumn('diskon');
             });
         }
     }
