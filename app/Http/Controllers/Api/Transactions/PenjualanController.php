@@ -170,7 +170,7 @@ class PenjualanController extends Controller
                 $nopenjualan = $request->nopenjualan;
             }
             $jumlahB = floor($validated['jumlah_k'] / $validated['isi']);
-            $subtotal = $validated['jumlah_k'] * $validated['harga_jual'];
+            $subtotal = ((float)$validated['jumlah_k'] * (float)$validated['harga_jual'] - (float)($validated['diskon'] ?? 0));
             $data = PenjualanH::updateOrCreate([
                 'nopenjualan' => $nopenjualan
             ], [

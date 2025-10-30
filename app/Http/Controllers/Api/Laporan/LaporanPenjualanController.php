@@ -39,6 +39,7 @@ class LaporanPenjualanController extends Controller
                         'penjualan_r_s.satuan_k',
                         'penjualan_r_s.harga_jual',
                         'penjualan_r_s.harga_beli',
+                        'penjualan_r_s.diskon',
                         'penjualan_r_s.subtotal',
                         'penjualan_h_s.tgl_penjualan',
                     )
@@ -54,7 +55,7 @@ class LaporanPenjualanController extends Controller
                         'retur_penjualan_rs.jumlah_k',
                         'retur_penjualan_rs.satuan_k',
                         'retur_penjualan_rs.harga',
-                        DB::raw('retur_penjualan_rs.jumlah_k * retur_penjualan_rs.harga as subtotal'),
+                        DB::raw('((retur_penjualan_rs.jumlah_k * retur_penjualan_rs.harga)-retur_penjualan_rs.diskon) as subtotal'),
                         'retur_penjualan_hs.tgl_retur',
                     )
                         ->leftJoin('retur_penjualan_hs', 'retur_penjualan_hs.noretur', '=', 'retur_penjualan_rs.noretur')
