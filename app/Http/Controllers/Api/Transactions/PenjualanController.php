@@ -186,13 +186,13 @@ class PenjualanController extends Controller
             $rinci = PenjualanR::updateOrCreate([
                 'nopenjualan' => $nopenjualan,
                 'kode_barang' => $validated['kode_barang'],
-                'id_penerimaan_rinci' => '',
                 'id_stok' => $validated['id_stok'],
                 'jumlah_k' => $validated['jumlah_k'],
             ], [
+                // 'id_penerimaan_rinci' => 0,
                 'jumlah_b' => $jumlahB,
-                'nopenerimaan' => '',
-                'nobatch' => '',
+                // 'nopenerimaan' => '',
+                // 'nobatch' => '',
                 'isi' => $validated['isi'],
                 'satuan_k' => $validated['satuan_k'],
                 'satuan_b' => $validated['satuan_b'],
