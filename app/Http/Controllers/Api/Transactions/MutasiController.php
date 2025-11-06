@@ -22,9 +22,9 @@ class MutasiController extends Controller
 {
     public function getCabang()
     {
-        $profile = ProfileToko::first();
+        // $profile = ProfileToko::first();
         $data = Cabang::select('kodecabang', 'namacabang')
-            ->where('kodecabang', '!=', $profile->kode_toko)
+            // ->where('kodecabang', '!=', $profile->kode_toko)
             ->get()->toArray();
 
 
