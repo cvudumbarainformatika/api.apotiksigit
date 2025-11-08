@@ -11,4 +11,7 @@ class Cabang extends Model
     use HasFactory, LogsActivity;
     protected $guarded = ['id'];
     protected $hidden = ['updated_at', 'created_at'];
+    protected $casts = [
+        'identitas' => 'array',
+    ];
 }

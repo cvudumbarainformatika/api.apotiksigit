@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('cabangs', function (Blueprint $table) {
-            $table->text('identitas')->nullable()->after('footer');
+            $table->text('identitas')->nullable()->after('namacabang');
+            $table->string('url')->nullable()->after('identitas');
+            $table->string('security')->nullable()->after('url');
         });
     }
 
@@ -24,6 +26,16 @@ return new class extends Migration
         if (Schema::hasColumn('cabangs', 'identitas')) {
             Schema::table('cabangs', function (Blueprint $table) {
                 $table->dropColumn('identitas');
+            });
+        }
+        if (Schema::hasColumn('cabangs', 'url')) {
+            Schema::table('cabangs', function (Blueprint $table) {
+                $table->dropColumn('url');
+            });
+        }
+        if (Schema::hasColumn('cabangs', 'security')) {
+            Schema::table('cabangs', function (Blueprint $table) {
+                $table->dropColumn('security');
             });
         }
     }
