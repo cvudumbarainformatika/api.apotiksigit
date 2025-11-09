@@ -562,6 +562,7 @@ class MutasiController extends Controller
             foreach ($req['rinci'] as $rinci) {
                 // return $rinci['kode_mutasi'];
                 $mutasi->rinci()->updateOrCreate([
+                    'mutasi_header_id' => $mutasi->id,
                     'kode_mutasi' => $rinci['kode_mutasi'],
                     'kode_barang' => $rinci['kode_barang'],
                 ], [
@@ -611,6 +612,7 @@ class MutasiController extends Controller
             foreach ($req['rinci'] as $rinci) {
                 // return $rinci['kode_mutasi'];
                 $mutasi->rinci()->updateOrCreate([
+                    'mutasi_header_id' => $mutasi->id,
                     'kode_mutasi' => $rinci['kode_mutasi'],
                     'kode_barang' => $rinci['kode_barang'],
                 ], [
