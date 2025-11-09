@@ -278,7 +278,9 @@ class MutasiController extends Controller
                 'transaction' => 'permintaan'
             ];
             $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
-            $kirim = Http::post($url, $data);
+            $kirim = Http::withHeaders([
+                'Accept' => 'application/json',
+            ])->post($url, $data);
             $resp = json_decode($kirim, true);
             $error = $kirim->body();
             return new JsonResponse([
