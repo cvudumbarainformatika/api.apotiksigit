@@ -280,12 +280,14 @@ class MutasiController extends Controller
             $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
             $kirim = Http::post($url, $data);
             $resp = json_decode($kirim, true);
+            $error = $resp->body();
             return new JsonResponse([
                 'data' => $mutasi,
                 'cabangTujuan' => $cabangTujuan,
                 'url' => $url,
                 'kirim' => $kirim,
                 'resp' => $resp,
+                'error' => $error,
             ]);
 
             $mutasi->update(['status' => '1']);
