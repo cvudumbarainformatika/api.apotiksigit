@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
   // 'middleware' => 'auth:api',
-  'middleware' => 'auth:sanctum',
+  // 'middleware' => 'auth:sanctum',
   'prefix' => 'transactions/mutasi'
 ], function () {
   Route::get('/get-cabang', [MutasiController::class, 'getCabang']); // ambil cabang dari tabel
