@@ -289,18 +289,6 @@ class MutasiController extends Controller
             $status = $kirim->status();
             $code = $feed['code'];
 
-            // $error = $kirim->body();
-            // return new JsonResponse([
-            //     'data' => $mutasi,
-            //     'cabangTujuan' => $cabangTujuan,
-            //     'url' => $url,
-            //     'kirim' => $kirim,
-            //     'resp' => $resp,
-            //     'feed' => $feed,
-            //     'status' => $status,
-            //     'code' => $code,
-            //     // 'error' => $error,
-            // ]);
             if ((int)$status != 200 && (int)$code != 200) throw new Exception(json_encode($resp));
             DB::commit();
 
@@ -394,6 +382,11 @@ class MutasiController extends Controller
             $mutasi = MutasiHeader::where('kode_mutasi', $validated['kode_mutasi'])->first();
             if (!$mutasi) throw new Exception('Data Transaksi Mutasi tidak ditemukan');
             if ($mutasi->status == '2') throw new Exception('Data Transaksi Mutasi Sudah di disatribusikan');
+
+            $cabangTujuan = Cabang::where('kodecabang', $mutasi->tujuan)->first();
+            if (!$cabangTujuan) throw new Exception('Tujuan Mutasi tidak ditemukan, mohon cek tujuan mutasi');
+
+
             // ambil rincian
             $rinci = MutasiRequest::where('kode_mutasi', $validated['kode_mutasi'])->get();
             $kode = $rinci->pluck('kode_barang');
@@ -412,6 +405,20 @@ class MutasiController extends Controller
                 'status' => '2',
                 'tgl_distribusi' => Carbon::now()->format('Y-m-d H:i:s')
             ]);
+            $data = (object)[
+                'mutasi' => $mutasi,
+                'transaction' => 'distribusi'
+            ];
+            $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
+            $kirim = Http::withHeaders([
+                'Accept' => 'application/json',
+            ])->post($url, $data);
+            $resp = json_decode($kirim, true);
+            $feed = $kirim->json('feedback');
+            $status = $kirim->status();
+            $code = $feed['code'];
+
+            if ((int)$status != 200 && (int)$code != 200) throw new Exception(json_encode($resp));
             DB::commit();
             $mutasi->load([
                 'rinci' => function ($q) {
