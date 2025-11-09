@@ -541,6 +541,7 @@ class MutasiController extends Controller
         if ($request->transaction == 'permintaan') $trx = self::curlKirimPermintaan($request->mutasi);
         if ($request->transaction == 'distribusi') $trx = self::curlKirimDistribusi($request->mutasi);
         $code = $trx['code'] ?? 410;
+        if ($code == 410) $message = $trx['message'];
         $feedback = [
             'message' => $message,
             'code' => $code,
