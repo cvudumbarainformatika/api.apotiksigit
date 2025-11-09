@@ -11,6 +11,7 @@ class MutasiHeader extends Model
 {
     use HasFactory, LogsActivity;
     protected $guarded = ['id'];
+    protected $hidden = ['updated_at', 'created_at'];
     public function rinci()
     {
         return $this->hasMany(MutasiRequest::class, 'kode_mutasi', 'kode_mutasi');

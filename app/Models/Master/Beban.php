@@ -11,6 +11,7 @@ class Beban extends Model
 {
     use HasFactory, LogsActivity;
     protected $guarded = ['id'];
+    protected $hidden = ['updated_at', 'created_at'];
     // dipake di laporan laba rugi
     public function rincian()
     {
