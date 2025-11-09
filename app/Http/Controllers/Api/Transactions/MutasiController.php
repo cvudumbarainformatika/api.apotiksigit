@@ -447,6 +447,11 @@ class MutasiController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
+            $data = json_decode($e->getMessage(), true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return response()->json($data, $data['code'] ?? 410);
+            }
             return response()->json([
                 'message' =>  $e->getMessage(),
                 'file' => $e->getFile(),
