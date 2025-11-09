@@ -282,6 +282,7 @@ class MutasiController extends Controller
                 'Accept' => 'application/json',
             ])->post($url, $data);
             $resp = json_decode($kirim, true);
+            $feed = $kirim->json('feedback');
             $error = $kirim->body();
             return new JsonResponse([
                 'data' => $mutasi,
@@ -289,7 +290,7 @@ class MutasiController extends Controller
                 'url' => $url,
                 'kirim' => $kirim,
                 'resp' => $resp,
-                'code' => $resp->feedback,
+                'feed' => $feed,
                 'error' => $error,
             ]);
 
