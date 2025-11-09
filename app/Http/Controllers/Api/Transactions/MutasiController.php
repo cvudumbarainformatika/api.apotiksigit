@@ -303,9 +303,9 @@ class MutasiController extends Controller
             $data = json_decode($e->getMessage(), true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 return response()->json([
-                    'message' => $data['message'],
-                    'code' => $data['code'],
-                    'trace' => $data['trx'],
+                    'message' => $data['feedback']['message'],
+                    'code' => $data['feedback']['code'],
+                    'trace' => $data['feedback']['trx'],
                 ], $data['code'] ?? 410);
             }
             return response()->json([
@@ -456,9 +456,9 @@ class MutasiController extends Controller
             if (json_last_error() === JSON_ERROR_NONE) {
                 return response()->json(
                     [
-                        'message' => $data['message'],
-                        'code' => $data['code'],
-                        'trace' => $data['trx'],
+                        'message' => $data['feedback']['message'],
+                        'code' => $data['feedback']['code'],
+                        'trace' => $data['feedback']['trx'],
                     ],
                     $data['code'] ?? 410
                 );
