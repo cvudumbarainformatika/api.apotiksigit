@@ -17,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class MutasiController extends Controller
 {
@@ -255,8 +256,9 @@ class MutasiController extends Controller
             $mutasi = MutasiHeader::where('kode_mutasi', $validated['kode_mutasi'])->first();
             if (!$mutasi) throw new Exception('Data Transaksi Mutasi tidak ditemukan');
             if ($mutasi->status == '1') throw new Exception('Transaksi sudah dikirim');
-            $mutasi->update(['status' => '1']);
-            DB::commit();
+
+            $cabangTujuan = Cabang::where('kodecabang', $mutasi->tujuan)->first();
+            if (!$cabangTujuan) throw new Exception('Tujuan Mutasi tidak ditemukan, mohon cek tujuan mutasi');
             $mutasi->load([
                 'rinci' => function ($q) {
                     $profile = ProfileToko::first();
@@ -271,6 +273,18 @@ class MutasiController extends Controller
                     ]);
                 }
             ]);
+            $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
+            $kirim = Http::post($url, $mutasi);
+            return new JsonResponse([
+                'data' => $mutasi,
+                'cabangTujuan' => $cabangTujuan,
+                'url' => $url,
+                'kirim' => $kirim,
+            ]);
+
+            $mutasi->update(['status' => '1']);
+            DB::commit();
+
             return new JsonResponse([
                 'data' => $mutasi,
                 'message' => 'Permintaan Mutasi Sudah dikirim',
@@ -475,5 +489,19 @@ class MutasiController extends Controller
 
             ], 410);
         }
+    }
+
+    public function terimaCurl(Request $request)
+    {
+
+        $message = 'Berhasil menyimpan data';
+        $code = 200;
+        $feedback = [
+            'message' => $message,
+            'code' => $code,
+        ];
+        return new JsonResponse([
+            'feedback' => $feedback
+        ]);
     }
 }

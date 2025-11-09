@@ -4,6 +4,7 @@ use App\Http\Controllers\DataMigration\CekDataController;
 use App\Models\Master\Barang;
 use App\Models\OldApp\Master\Product;
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,4 +34,12 @@ Route::get('/cek', function () {
         'prod' => $prod,
         'barang' => $barang,
     ];
+});
+Route::get('/test-curl', function () {
+    try {
+        $response = Http::timeout(10)->post('http://api.apotiksigit.test/api/v1/transactions/curl-mutasi/terima-curl');
+        return $response->json();
+    } catch (\Throwable $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
 });

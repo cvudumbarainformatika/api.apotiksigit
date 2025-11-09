@@ -18,3 +18,12 @@ Route::group([
   Route::post('/kirim-distribusi', [MutasiController::class, 'kirimDistribusi']); // kirim balik yang sudah di isi jumlah distribusinya
   Route::post('/terima', [MutasiController::class, 'terima']); // terima barang yang di distribusi oleh gudang
 });
+
+/**
+ * ini untuk curl
+ */
+Route::group([
+  'prefix' => 'transactions/curl-mutasi'
+], function () {
+  Route::post('/terima-curl', [MutasiController::class, 'terimaCurl']); // terima barang yang di distribusi oleh gudang
+});
