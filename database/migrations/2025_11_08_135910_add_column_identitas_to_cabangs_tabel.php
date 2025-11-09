@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('url')->nullable()->after('identitas');
             $table->string('security')->nullable()->after('url');
         });
+        Schema::table('mutasi_requests', function (Blueprint $table) {
+            $table->unsignedBigInteger('mutasi_header_id')->nullable()->after('id');
+        });
     }
 
     /**
@@ -36,6 +39,11 @@ return new class extends Migration
         if (Schema::hasColumn('cabangs', 'security')) {
             Schema::table('cabangs', function (Blueprint $table) {
                 $table->dropColumn('security');
+            });
+        }
+        if (Schema::hasColumn('mutasi_requests', 'mutasi_header_id')) {
+            Schema::table('mutasi_requests', function (Blueprint $table) {
+                $table->dropColumn('mutasi_header_id');
             });
         }
     }

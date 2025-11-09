@@ -502,16 +502,14 @@ class MutasiController extends Controller
 
         $message = 'Berhasil menyimpan data';
         $code = 200;
-        if ($request->transaction == 'permintaan') $trx = self::curlKirimPermintaan($request);
+        if ($request->transaction == 'permintaan') $trx = self::curlKirimPermintaan($request->mutasi);
+        if ($request->transaction == 'distribusi') $trx = self::curlKirimDistribusi($request->mutasi);
         $feedback = [
             'message' => $message,
             'code' => $code,
             'trx' => $trx ?? null,
-            'rinci' => $request->mutasi['rinci'],
-            'request' => $request->all(),
-
-
-
+            // 'rinci' => $request->mutasi['rinci'],
+            // 'request' => $request->all(),
         ];
         return new JsonResponse([
             'feedback' => $feedback
@@ -519,7 +517,66 @@ class MutasiController extends Controller
     }
     public static function curlKirimPermintaan($req)
     {
+        // $mutasi = MutasiHeader::where('kode_mutasi', $req['kode_mutasi'])->where('dari', $req['dari'])->where('tujuan', $req['tujuan'])->first();
+        $mutasi = MutasiHeader::updateOrCreate([
+            'kode_mutasi' => $req['kode_mutasi'],
+            'dari' => $req['dari'],
+            'tujuan' => $req['tujuan']
+        ], [
+            'tgl_permintaan' => $req['tgl_permintaan'],
+            'tgl_distribusi' => $req['tgl_distribusi'],
+            'tgl_terima' => $req['tgl_terima'],
+            'status' => $req['status'],
 
-        return $req->all();
+        ]);
+        foreach ($req['rinci'] as $rinci) {
+            // return $rinci['kode_mutasi'];
+            $mutasi->rinci()->updateOrCreate([
+                'kode_mutasi' => $rinci['kode_mutasi'],
+                'kode_barang' => $rinci['kode_barang'],
+            ], [
+                'jumlah' => $rinci['jumlah'],
+                'harga_beli' => $rinci['harga_beli'],
+                'satuan_k' => $rinci['satuan_k'],
+            ]);
+        }
+        return [
+            'rinci' => $req['rinci'],
+            'mutasi' => $mutasi,
+            'requset' => $req,
+
+        ];
+    }
+    public static function curlKirimDistribusi($req)
+    {
+        // $mutasi = MutasiHeader::where('kode_mutasi', $req['kode_mutasi'])->where('dari', $req['dari'])->where('tujuan', $req['tujuan'])->first();
+        $mutasi = MutasiHeader::updateOrCreate([
+            'kode_mutasi' => $req['kode_mutasi'],
+            'dari' => $req['dari'],
+            'tujuan' => $req['tujuan']
+        ], [
+            'tgl_permintaan' => $req['tgl_permintaan'],
+            'tgl_distribusi' => $req['tgl_distribusi'],
+            'tgl_terima' => $req['tgl_terima'],
+            'status' => $req['status'],
+
+        ]);
+        foreach ($req['rinci'] as $rinci) {
+            // return $rinci['kode_mutasi'];
+            $mutasi->rinci()->updateOrCreate([
+                'kode_mutasi' => $rinci['kode_mutasi'],
+                'kode_barang' => $rinci['kode_barang'],
+            ], [
+                'distribusi' => $rinci['distribusi'],
+                'harga_beli' => $rinci['harga_beli'],
+                'satuan_k' => $rinci['satuan_k'],
+            ]);
+        }
+        return [
+            'rinci' => $req['rinci'],
+            'mutasi' => $mutasi,
+            'requset' => $req,
+
+        ];
     }
 }
