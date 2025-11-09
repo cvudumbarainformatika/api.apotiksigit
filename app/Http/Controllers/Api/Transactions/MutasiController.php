@@ -421,7 +421,7 @@ class MutasiController extends Controller
             $status = $kirim->status();
             $code = $feed['code'];
 
-            if ((int)$status != 200 && (int)$code != 200) throw new Exception(json_encode($resp));
+            if ((int)$status != 200 || (int)$code != 200) throw new Exception(json_encode($resp));
             DB::commit();
             $mutasi->load([
                 'rinci' => function ($q) {
@@ -438,7 +438,7 @@ class MutasiController extends Controller
                 }
             ]);
             return new JsonResponse([
-                'if' => (int)$status != 200 && (int)$code != 200,
+                'if' => (int)$status != 200 || (int)$code != 200,
                 'feed' => $feed,
                 'status' => $status,
                 'code' => $code,
