@@ -245,15 +245,14 @@ class MutasiController extends Controller
     public function kirim(Request $request)
     {
         $validated = $request->validate([
-
-            'kode_mutasi' => 'required',
+            'id' => 'required',
         ], [
 
-            'kode_mutasi.required' => 'Nomor Transaksi Harus di isi',
+            'id.required' => 'Id Header Mutasi harus di isi',
         ]);
         try {
             DB::beginTransaction();
-            $mutasi = MutasiHeader::where('kode_mutasi', $validated['kode_mutasi'])->first();
+            $mutasi = MutasiHeader::find($validated['id']);
             if (!$mutasi) throw new Exception('Data Transaksi Mutasi tidak ditemukan');
             if ($mutasi->status == '1') throw new Exception('Transaksi sudah dikirim');
 
@@ -374,13 +373,14 @@ class MutasiController extends Controller
     public function kirimDistribusi(Request $request)
     {
         $validated = $request->validate([
-            'kode_mutasi' => 'required',
+            'id' => 'required',
         ], [
-            'kode_mutasi.required' => 'Nomor Transaksi Harus di isi',
+
+            'id.required' => 'Id Header Mutasi harus di isi',
         ]);
         try {
             DB::beginTransaction();
-            $mutasi = MutasiHeader::where('kode_mutasi', $validated['kode_mutasi'])->first();
+            $mutasi = MutasiHeader::find($validated['id']);
             if (!$mutasi) throw new Exception('Data Transaksi Mutasi tidak ditemukan');
             if ($mutasi->status == '2') throw new Exception('Data Transaksi Mutasi Sudah di disatribusikan');
 
@@ -389,7 +389,7 @@ class MutasiController extends Controller
 
 
             // ambil rincian
-            $rinci = MutasiRequest::where('kode_mutasi', $validated['kode_mutasi'])->get();
+            $rinci = MutasiRequest::where('mutasi_header_id', $mutasi->id)->get();
             $kode = $rinci->pluck('kode_barang');
             $stok = Stok::lockForUpdate()->whereIn('kode_barang', $kode)->where('kode_depo', $mutasi->tujuan)->get();
             // kurangi stok
