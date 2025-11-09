@@ -438,6 +438,7 @@ class MutasiController extends Controller
                 }
             ]);
             return new JsonResponse([
+                'if' => (int)$status != 200 && (int)$code != 200,
                 'feed' => $feed,
                 'status' => $status,
                 'code' => $code,
