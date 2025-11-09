@@ -259,6 +259,9 @@ class MutasiController extends Controller
 
             $cabangTujuan = Cabang::where('kodecabang', $mutasi->tujuan)->first();
             if (!$cabangTujuan) throw new Exception('Tujuan Mutasi tidak ditemukan, mohon cek tujuan mutasi');
+
+
+            $mutasi->update(['status' => '1']);
             $mutasi->load([
                 'rinci' => function ($q) {
                     $profile = ProfileToko::first();
@@ -285,20 +288,20 @@ class MutasiController extends Controller
             $feed = $kirim->json('feedback');
             $status = $kirim->status();
             $code = $feed['code'];
-            $error = $kirim->body();
-            return new JsonResponse([
-                'data' => $mutasi,
-                'cabangTujuan' => $cabangTujuan,
-                'url' => $url,
-                'kirim' => $kirim,
-                'resp' => $resp,
-                'feed' => $feed,
-                'status' => $status,
-                'code' => $code,
-                'error' => $error,
-            ]);
 
-            $mutasi->update(['status' => '1']);
+            // $error = $kirim->body();
+            // return new JsonResponse([
+            //     'data' => $mutasi,
+            //     'cabangTujuan' => $cabangTujuan,
+            //     'url' => $url,
+            //     'kirim' => $kirim,
+            //     'resp' => $resp,
+            //     'feed' => $feed,
+            //     'status' => $status,
+            //     'code' => $code,
+            //     // 'error' => $error,
+            // ]);
+            if ((int)$status && (int)$code != 200) throw new Exception(json_encode($resp));
             DB::commit();
 
             return new JsonResponse([
@@ -307,6 +310,10 @@ class MutasiController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+            $data = json_decode($e->getMessage(), true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return response()->json($data, $data['code'] ?? 410);
+            }
             return response()->json([
                 'message' =>  $e->getMessage(),
                 'file' => $e->getFile(),
