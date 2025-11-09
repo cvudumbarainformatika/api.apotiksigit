@@ -123,6 +123,7 @@ class MutasiController extends Controller
     public function simpan(Request $request)
     {
         $kode = $request->kode_mutasi;
+        $id = $request->id;
         $validated = $request->validate([
 
             'tgl_permintaan' => 'nullable',
@@ -148,20 +149,31 @@ class MutasiController extends Controller
                 $nomor = DB::table('counter')->select('kode_mutasi')->first();
                 $kode_mutasi = FormatingHelper::genKodeBarang($nomor->kode_mutasi, 'TRX');
             } else {
-                $kode_mutasi = $request->kode_mutasi;
+                $kode_mutasi = $kode;
             }
-            $tgl_permintaan = $validated['tgl_permintaan'] . date(' H:i:s') ?? Carbon::now()->format('Y-m-d H:i:s');
+            $tgl_permintaan = $validated['tgl_permintaan'] ? $validated['tgl_permintaan'] . date(' H:i:s') : Carbon::now()->format('Y-m-d H:i:s');
             $pengirim = $validated['pengirim']  ?? $user->kode;
             $dari = $validated['dari']  ?? $profile->kode_toko;
-            $data = MutasiHeader::updateOrCreate([
-                'kode_mutasi' => $kode_mutasi
-            ], [
-                'tgl_permintaan' => $tgl_permintaan,
-                'pengirim' => $pengirim,
-                'dari' => $dari,
-                'tujuan' => $validated['tujuan'],
-            ]);
+            $data = MutasiHeader::find($id);
+            if ($data) {
+                $data->update([
+                    'kode_mutasi' => $kode_mutasi,
+                    'tgl_permintaan' => $tgl_permintaan,
+                    'pengirim' => $pengirim,
+                    'dari' => $dari,
+                    'tujuan' => $validated['tujuan'],
+                ]);
+            } else {
+                $data = MutasiHeader::create([
+                    'kode_mutasi' => $kode_mutasi,
+                    'tgl_permintaan' => $tgl_permintaan,
+                    'pengirim' => $pengirim,
+                    'dari' => $dari,
+                    'tujuan' => $validated['tujuan'],
+                ]);
+            }
             $data->rinci()->updateOrCreate([
+                'mutasi_header_id' => $data->id,
                 'kode_mutasi' => $kode_mutasi,
                 'kode_barang' => $validated['kode_barang'],
             ], [
@@ -207,6 +219,7 @@ class MutasiController extends Controller
         $validated = $request->validate([
             'kode_barang' => 'required',
             'kode_mutasi' => 'required',
+            'id' => 'required',
         ], [
             'kode_barang.required' => 'Tidak Ada Rincian untuk dihapus',
             'kode_mutasi.required' => 'Nomor Transaksi Harus di isi',
@@ -214,15 +227,15 @@ class MutasiController extends Controller
         try {
             DB::beginTransaction();
             $msg = 'Rincian Obat sudah dihapus';
-            $rinci = MutasiRequest::where('kode_barang', $validated['kode_barang'])->where('kode_mutasi', $validated['kode_mutasi'])->first();
-            if (!$rinci) throw new Exception('Data Obat tidak ditemukan');
-            $header = MutasiHeader::where('kode_mutasi', $validated['kode_mutasi'])->first();
+            $header = MutasiHeader::finc($validated['id']);
             if (!$header) throw new Exception('Data Header Mutasi tidak ditemukan, transaksi tidak bisa dilanjutkan');
+            $rinci = MutasiRequest::where('kode_barang', $validated['kode_barang'])->where('mutasi_header_id', $header->id)->first();
+            if (!$rinci) throw new Exception('Data Obat tidak ditemukan');
             if ($header->status !== null) throw new Exception('Data sudah terkunci, tidak boleh dihapus');
             // hapus rincian
             $rinci->delete();
             // hitung sisa rincian
-            $sisaRinci = MutasiRequest::where('kode_mutasi', $validated['kode_mutasi'])->count();
+            $sisaRinci = MutasiRequest::where('mutasi_header_id',  $header->id)->count();
             if ($sisaRinci == 0) {
                 $header->delete();
                 $msg = 'Semua rincian dihapus, data header juga dihapus';
@@ -320,12 +333,14 @@ class MutasiController extends Controller
     public function simpanDistribusi(Request $request)
     {
         $validated = $request->validate([
+            'id' => 'required',
             'kode_mutasi' => 'required',
             'kode_barang' => 'required',
             'distribusi' => 'required',
             'harga_beli' => 'required',
             'satuan_k' => 'required',
         ], [
+            'id.required' => 'Id Header Mutasi di isi',
             'kode_mutasi.required' => 'Nomor Transaksi Harus di isi',
             'kode_barang.required' => 'Kode Barang Harus di isi',
             'distribusi.required' => 'Jumlah yang akan di distribusikan Harus di isi',
@@ -334,9 +349,9 @@ class MutasiController extends Controller
         ]);
         try {
             DB::beginTransaction();
-            $data = MutasiHeader::where('kode_mutasi', $validated['kode_mutasi'])->first();
+            $data = MutasiHeader::find($validated['id']);
             if (!$data) throw new Exception('Data mutasi tidak ditemukan, transaksi tidak dapat dilanjutkan');
-            $rinci = MutasiRequest::where('kode_mutasi', $validated['kode_mutasi'])->where('kode_barang', $validated['kode_barang'])->first();
+            $rinci = MutasiRequest::where('mutasi_header_id', $data->id)->where('kode_barang', $validated['kode_barang'])->first();
             if (!$rinci) throw new Exception('Data Barang tidak ditemukan, transaksi tidak dapat dilanjutkan');
             // cek stok -> yang penting ada... nilainya boleh minus
             $stok = Stok::where('kode_barang', $validated['kode_barang'])->where('kode_depo', $data->tujuan)->first();
@@ -381,7 +396,6 @@ class MutasiController extends Controller
         $validated = $request->validate([
             'id' => 'required',
         ], [
-
             'id.required' => 'Id Header Mutasi harus di isi',
         ]);
         try {
