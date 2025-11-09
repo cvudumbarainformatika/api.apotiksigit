@@ -301,7 +301,7 @@ class MutasiController extends Controller
             //     'code' => $code,
             //     // 'error' => $error,
             // ]);
-            if ((int)$status && (int)$code != 200) throw new Exception(json_encode($resp));
+            if ((int)$status != 200 && (int)$code != 200) throw new Exception(json_encode($resp));
             DB::commit();
 
             return new JsonResponse([
