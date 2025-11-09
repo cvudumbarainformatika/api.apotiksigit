@@ -293,7 +293,8 @@ class MutasiController extends Controller
             DB::commit();
 
             return new JsonResponse([
-                'data' => $mutasi,
+                'data' => $mutasi,,
+                'feed' => $feed,
                 'message' => 'Permintaan Mutasi Sudah dikirim',
             ]);
         } catch (\Exception $e) {
@@ -436,7 +437,8 @@ class MutasiController extends Controller
             ]);
             return new JsonResponse([
                 'message' => 'Data Distribusi Sudah dikirim',
-                'data' => $mutasi
+                'data' => $mutasi,
+                'feed' => $feed,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -571,11 +573,12 @@ class MutasiController extends Controller
                     'satuan_k' => $rinci['satuan_k'],
                 ]);
             }
+            $mutasi->load('rinci');
             DB::commit();
             return [
-                'rinci' => $req['rinci'],
+                // 'rinci' => $req['rinci'],
                 'mutasi' => $mutasi,
-                'requset' => $req,
+                // 'requset' => $req,
                 'code' => 200
 
             ];
@@ -621,11 +624,13 @@ class MutasiController extends Controller
                     'satuan_k' => $rinci['satuan_k'],
                 ]);
             }
+
+            $mutasi->load('rinci');
             DB::commit();
             return [
-                'rinci' => $req['rinci'],
+                // 'rinci' => $req['rinci'],
                 'mutasi' => $mutasi,
-                'requset' => $req,
+                // 'requset' => $req,
                 'code' => 200
 
             ];
