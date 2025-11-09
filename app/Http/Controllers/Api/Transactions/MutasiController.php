@@ -275,7 +275,7 @@ class MutasiController extends Controller
             ]);
             $data = (object)[
                 'mutasi' => $mutasi,
-                'transaction' => 'kirim-permintaan'
+                'transaction' => 'permintaan'
             ];
             $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
             $kirim = Http::post($url, $data);
@@ -502,17 +502,22 @@ class MutasiController extends Controller
 
         $message = 'Berhasil menyimpan data';
         $code = 200;
+        if ($request->transaction == 'permintaan')
+            $feedback = [
+                'message' => $message,
+                'code' => $code,
+                'rinci' => $request->mutasi['rinci'],
+                'request' => $request->all(),
 
-        $feedback = [
-            'message' => $message,
-            'code' => $code,
-            'request' => $request->all(),
-            'rinci' => $request->rinci,
 
-
-        ];
+            ];
         return new JsonResponse([
             'feedback' => $feedback
         ]);
+    }
+    public static function curlKirimPermintaan($req)
+    {
+
+        return $req;
     }
 }
