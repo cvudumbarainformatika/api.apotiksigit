@@ -302,7 +302,11 @@ class MutasiController extends Controller
             DB::rollBack();
             $data = json_decode($e->getMessage(), true);
             if (json_last_error() === JSON_ERROR_NONE) {
-                return response()->json($data, $data['code'] ?? 410);
+                return response()->json([
+                    'message' => $data['message'],
+                    'code' => $data['code'],
+                    'trace' => $data['trx'],
+                ], $data['code'] ?? 410);
             }
             return response()->json([
                 'message' =>  $e->getMessage(),
@@ -450,7 +454,14 @@ class MutasiController extends Controller
 
             $data = json_decode($e->getMessage(), true);
             if (json_last_error() === JSON_ERROR_NONE) {
-                return response()->json($data, $data['code'] ?? 410);
+                return response()->json(
+                    [
+                        'message' => $data['message'],
+                        'code' => $data['code'],
+                        'trace' => $data['trx'],
+                    ],
+                    $data['code'] ?? 410
+                );
             }
             return response()->json([
                 'message' =>  $e->getMessage(),
