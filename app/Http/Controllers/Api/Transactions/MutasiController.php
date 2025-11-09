@@ -502,15 +502,17 @@ class MutasiController extends Controller
 
         $message = 'Berhasil menyimpan data';
         $code = 200;
-        if ($request->transaction == 'permintaan')
-            $feedback = [
-                'message' => $message,
-                'code' => $code,
-                'rinci' => $request->mutasi['rinci'],
-                'request' => $request->all(),
+        if ($request->transaction == 'permintaan') $trx = self::curlKirimPermintaan($request);
+        $feedback = [
+            'message' => $message,
+            'code' => $code,
+            'trx' => $trx ?? null,
+            'rinci' => $request->mutasi['rinci'],
+            'request' => $request->all(),
 
 
-            ];
+
+        ];
         return new JsonResponse([
             'feedback' => $feedback
         ]);
@@ -518,6 +520,6 @@ class MutasiController extends Controller
     public static function curlKirimPermintaan($req)
     {
 
-        return $req;
+        return $req->all();
     }
 }
