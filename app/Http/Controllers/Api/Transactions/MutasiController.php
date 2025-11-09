@@ -412,6 +412,20 @@ class MutasiController extends Controller
                 'status' => '2',
                 'tgl_distribusi' => Carbon::now()->format('Y-m-d H:i:s')
             ]);
+            $mutasi->load([
+                'rinci' => function ($q) {
+                    $profile = ProfileToko::first();
+                    $q->with([
+                        'master:nama,kode,satuan_k,satuan_b,isi,kandungan',
+                        'stok' => function ($r) use ($profile) {
+                            $r->where('kode_depo', $profile->kode_toko);
+                        },
+                        'stokGudang' => function ($r) use ($profile) {
+                            $r->where('kode_depo', 'APS0000');
+                        },
+                    ]);
+                }
+            ]);
             $data = (object)[
                 'mutasi' => $mutasi,
                 'transaction' => 'distribusi'
@@ -427,20 +441,7 @@ class MutasiController extends Controller
 
             if ((int)$status != 200 || (int)$code != 200) throw new Exception(json_encode($resp));
             DB::commit();
-            $mutasi->load([
-                'rinci' => function ($q) {
-                    $profile = ProfileToko::first();
-                    $q->with([
-                        'master:nama,kode,satuan_k,satuan_b,isi,kandungan',
-                        'stok' => function ($r) use ($profile) {
-                            $r->where('kode_depo', $profile->kode_toko);
-                        },
-                        'stokGudang' => function ($r) use ($profile) {
-                            $r->where('kode_depo', 'APS0000');
-                        },
-                    ]);
-                }
-            ]);
+
             return new JsonResponse([
                 'if' => (int)$status != 200 || (int)$code != 200,
                 'feed' => $feed,
