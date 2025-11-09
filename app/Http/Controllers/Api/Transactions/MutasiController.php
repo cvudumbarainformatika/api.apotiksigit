@@ -476,19 +476,19 @@ class MutasiController extends Controller
     public function terima(Request $request)
     {
         $validated = $request->validate([
-            'kode_mutasi' => 'required',
+            'id' => 'required',
             'penerima' => 'nullable',
         ], [
-            'kode_mutasi.required' => 'Nomor Transaksi Harus di isi',
+            'id.required' => 'Nomor Transaksi Harus di isi',
         ]);
         try {
             DB::beginTransaction();
-            $mutasi = MutasiHeader::where('kode_mutasi', $validated['kode_mutasi'])->first();
+            $mutasi = MutasiHeader::finc($validated['id']);
             $profile = ProfileToko::first();
             if (!$mutasi) throw new Exception('Data Transaksi Mutasi tidak ditemukan');
             if ($mutasi->status == '3') throw new Exception('Data Transaksi Mutasi sudah Diterima');
             // ambil rincian
-            $rinci = MutasiRequest::where('kode_mutasi', $validated['kode_mutasi'])->get();
+            $rinci = MutasiRequest::where('mutasi_header_id', $mutasi->id)->get();
             $kode = $rinci->pluck('kode_barang');
             $stok = Stok::lockForUpdate()->whereIn('kode_barang', $kode)->where('kode_depo', $mutasi->dari)->get();
             // kurangi stok
