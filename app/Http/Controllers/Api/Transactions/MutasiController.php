@@ -438,9 +438,11 @@ class MutasiController extends Controller
                 }
             ]);
             return new JsonResponse([
+                'feed' => $feed,
+                'status' => $status,
+                'code' => $code,
                 'message' => 'Data Distribusi Sudah dikirim',
                 'data' => $mutasi,
-                'feed' => $feed,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
