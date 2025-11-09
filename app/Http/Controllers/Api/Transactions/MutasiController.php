@@ -508,6 +508,7 @@ class MutasiController extends Controller
         $code = 200;
         if ($request->transaction == 'permintaan') $trx = self::curlKirimPermintaan($request->mutasi);
         if ($request->transaction == 'distribusi') $trx = self::curlKirimDistribusi($request->mutasi);
+        $code = $trx['code'] ?? 410;
         $feedback = [
             'message' => $message,
             'code' => $code,
@@ -522,65 +523,100 @@ class MutasiController extends Controller
     public static function curlKirimPermintaan($req)
     {
         // $mutasi = MutasiHeader::where('kode_mutasi', $req['kode_mutasi'])->where('dari', $req['dari'])->where('tujuan', $req['tujuan'])->first();
-        $mutasi = MutasiHeader::updateOrCreate([
-            'kode_mutasi' => $req['kode_mutasi'],
-            'dari' => $req['dari'],
-            'tujuan' => $req['tujuan']
-        ], [
-            'tgl_permintaan' => $req['tgl_permintaan'],
-            'tgl_distribusi' => $req['tgl_distribusi'],
-            'tgl_terima' => $req['tgl_terima'],
-            'status' => $req['status'],
+        try {
+            DB::beginTransaction();
 
-        ]);
-        foreach ($req['rinci'] as $rinci) {
-            // return $rinci['kode_mutasi'];
-            $mutasi->rinci()->updateOrCreate([
-                'kode_mutasi' => $rinci['kode_mutasi'],
-                'kode_barang' => $rinci['kode_barang'],
+            $mutasi = MutasiHeader::updateOrCreate([
+                'kode_mutasi' => $req['kode_mutasi'],
+                'dari' => $req['dari'],
+                'tujuan' => $req['tujuan']
             ], [
-                'jumlah' => $rinci['jumlah'],
-                'harga_beli' => $rinci['harga_beli'],
-                'satuan_k' => $rinci['satuan_k'],
-            ]);
-        }
-        return [
-            'rinci' => $req['rinci'],
-            'mutasi' => $mutasi,
-            'requset' => $req,
+                'pengirim' => $req['pengirim'],
+                'penerima' => $req['penerima'],
+                'tgl_permintaan' => $req['tgl_permintaan'],
+                'tgl_distribusi' => $req['tgl_distribusi'],
+                'tgl_terima' => $req['tgl_terima'],
+                'status' => $req['status'],
 
-        ];
+            ]);
+            foreach ($req['rinci'] as $rinci) {
+                // return $rinci['kode_mutasi'];
+                $mutasi->rinci()->updateOrCreate([
+                    'kode_mutasi' => $rinci['kode_mutasi'],
+                    'kode_barang' => $rinci['kode_barang'],
+                ], [
+                    'jumlah' => $rinci['jumlah'],
+                    'harga_beli' => $rinci['harga_beli'],
+                    'satuan_k' => $rinci['satuan_k'],
+                ]);
+            }
+            DB::commit();
+            return [
+                'rinci' => $req['rinci'],
+                'mutasi' => $mutasi,
+                'requset' => $req,
+                'code' => 200
+
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return [
+                'code' => 410,
+                'message' =>  $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTrace(),
+
+            ];
+        }
     }
     public static function curlKirimDistribusi($req)
     {
-        // $mutasi = MutasiHeader::where('kode_mutasi', $req['kode_mutasi'])->where('dari', $req['dari'])->where('tujuan', $req['tujuan'])->first();
-        $mutasi = MutasiHeader::updateOrCreate([
-            'kode_mutasi' => $req['kode_mutasi'],
-            'dari' => $req['dari'],
-            'tujuan' => $req['tujuan']
-        ], [
-            'tgl_permintaan' => $req['tgl_permintaan'],
-            'tgl_distribusi' => $req['tgl_distribusi'],
-            'tgl_terima' => $req['tgl_terima'],
-            'status' => $req['status'],
-
-        ]);
-        foreach ($req['rinci'] as $rinci) {
-            // return $rinci['kode_mutasi'];
-            $mutasi->rinci()->updateOrCreate([
-                'kode_mutasi' => $rinci['kode_mutasi'],
-                'kode_barang' => $rinci['kode_barang'],
+        try {
+            DB::beginTransaction();
+            // $mutasi = MutasiHeader::where('kode_mutasi', $req['kode_mutasi'])->where('dari', $req['dari'])->where('tujuan', $req['tujuan'])->first();
+            $mutasi = MutasiHeader::updateOrCreate([
+                'kode_mutasi' => $req['kode_mutasi'],
+                'dari' => $req['dari'],
+                'tujuan' => $req['tujuan']
             ], [
-                'distribusi' => $rinci['distribusi'],
-                'harga_beli' => $rinci['harga_beli'],
-                'satuan_k' => $rinci['satuan_k'],
-            ]);
-        }
-        return [
-            'rinci' => $req['rinci'],
-            'mutasi' => $mutasi,
-            'requset' => $req,
+                'pengirim' => $req['pengirim'],
+                'penerima' => $req['penerima'],
+                'tgl_permintaan' => $req['tgl_permintaan'],
+                'tgl_distribusi' => $req['tgl_distribusi'],
+                'tgl_terima' => $req['tgl_terima'],
+                'status' => $req['status'],
 
-        ];
+            ]);
+            foreach ($req['rinci'] as $rinci) {
+                // return $rinci['kode_mutasi'];
+                $mutasi->rinci()->updateOrCreate([
+                    'kode_mutasi' => $rinci['kode_mutasi'],
+                    'kode_barang' => $rinci['kode_barang'],
+                ], [
+                    'distribusi' => $rinci['distribusi'],
+                    'harga_beli' => $rinci['harga_beli'],
+                    'satuan_k' => $rinci['satuan_k'],
+                ]);
+            }
+            DB::commit();
+            return [
+                'rinci' => $req['rinci'],
+                'mutasi' => $mutasi,
+                'requset' => $req,
+                'code' => 200
+
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return [
+                'code' => 410,
+                'message' =>  $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTrace(),
+
+            ];
+        }
     }
 }
