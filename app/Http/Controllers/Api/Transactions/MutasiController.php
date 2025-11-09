@@ -292,8 +292,10 @@ class MutasiController extends Controller
             DB::commit();
 
             return new JsonResponse([
-                'data' => $mutasi,
+                'status' => $status,
+                'code' => $code,
                 'feed' => $feed,
+                'data' => $mutasi,
                 'message' => 'Permintaan Mutasi Sudah dikirim',
             ]);
         } catch (\Exception $e) {
