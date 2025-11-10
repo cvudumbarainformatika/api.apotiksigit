@@ -288,20 +288,24 @@ class MutasiController extends Controller
                     ]);
                 }
             ]);
-            $data = (object)[
-                'mutasi' => $mutasi,
-                'transaction' => 'permintaan'
-            ];
-            $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
-            $kirim = Http::withHeaders([
-                'Accept' => 'application/json',
-            ])->post($url, $data);
-            $resp = json_decode($kirim, true);
-            $feed = $kirim->json('feedback');
-            $status = $kirim->status();
-            $code = $feed['code'];
 
-            if ((int)$status != 200 && (int)$code != 200) throw new Exception(json_encode($resp));
+            $cabangMinta = Cabang::where('kodecabang', $mutasi->dari)->first();
+            if ($cabangMinta->url != $cabangTujuan->url) {
+                $data = (object)[
+                    'mutasi' => $mutasi,
+                    'transaction' => 'permintaan'
+                ];
+                $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
+                $kirim = Http::withHeaders([
+                    'Accept' => 'application/json',
+                ])->post($url, $data);
+                $resp = json_decode($kirim, true);
+                $feed = $kirim->json('feedback');
+                $status = $kirim->status();
+                $code = $feed['code'];
+
+                if ((int)$status != 200 && (int)$code != 200) throw new Exception(json_encode($resp));
+            }
             DB::commit();
 
             return new JsonResponse([
@@ -440,20 +444,24 @@ class MutasiController extends Controller
                     ]);
                 }
             ]);
-            $data = (object)[
-                'mutasi' => $mutasi,
-                'transaction' => 'distribusi'
-            ];
-            $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
-            $kirim = Http::withHeaders([
-                'Accept' => 'application/json',
-            ])->post($url, $data);
-            $resp = json_decode($kirim, true);
-            $feed = $kirim->json('feedback');
-            $status = $kirim->status();
-            $code = $feed['code'];
+            $cabangMinta = Cabang::where('kodecabang', $mutasi->dari)->first();
+            if ($cabangMinta->url != $cabangTujuan->url) {
+                $data = (object)[
+                    'mutasi' => $mutasi,
+                    'transaction' => 'distribusi'
+                ];
+                $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
+                $kirim = Http::withHeaders([
+                    'Accept' => 'application/json',
+                ])->post($url, $data);
+                $resp = json_decode($kirim, true);
+                $feed = $kirim->json('feedback');
+                $status = $kirim->status();
+                $code = $feed['code'];
 
-            if ((int)$status != 200 || (int)$code != 200) throw new Exception(json_encode($resp));
+                if ((int)$status != 200 || (int)$code != 200) throw new Exception(json_encode($resp));
+            }
+
             DB::commit();
 
             return new JsonResponse([
