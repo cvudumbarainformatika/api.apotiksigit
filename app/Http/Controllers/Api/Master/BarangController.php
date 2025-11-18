@@ -42,6 +42,7 @@ class BarangController extends Controller
         $validated = $request->validate([
             'nama' => 'required',
             'satuan_k' => 'nullable',
+            'barcode' => 'nullable',
             'satuan_b' => 'nullable',
             'isi' => 'nullable',
             'merk' => 'nullable',

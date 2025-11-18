@@ -83,6 +83,7 @@ class OrderController extends Controller
         $validated = $request->validate([
             'nomor_order' => 'nullable',
             'tgl_order' => 'nullable',
+            'kode_depo' => 'nullable',
             'kode_supplier' => 'required',
             'kode_barang' => 'required',
             'jumlah_pesan' => 'required',
