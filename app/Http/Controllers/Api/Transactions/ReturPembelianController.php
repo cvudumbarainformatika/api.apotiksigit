@@ -65,11 +65,11 @@ class ReturPembelianController extends Controller
                 },
                 'suplier',
             ])
-           ->where('flag', '1')
-           ->get();
+            ->where('flag', '1')
+            ->get();
         return new JsonResponse([
             'data' => $query
-        ],200);
+        ], 200);
     }
 
     public function simpan(Request $request)
@@ -83,7 +83,7 @@ class ReturPembelianController extends Controller
             'kode_supplier' => 'required',
             'kode_barang' => 'required',
             'nobatch' => 'required',
-            'id_penerimaan_rinci' => 'required',
+            'id_penerimaan_rinci' => 'nullable',
             'isi' => 'required',
             'satuan_k' => 'required',
             'satuan_b' => 'required',
@@ -110,7 +110,7 @@ class ReturPembelianController extends Controller
             'kode_supplier.required' => 'Kode Supplier Harus Di isi.',
             'kode_barang.required' => 'Kode Barang Harus Di isi.',
             'nobatch.required' => 'No. Batch Harus Di isi.',
-            'id_penerimaan_rinci.required' => 'id Rincian Penerimaan belum di ikutkan, silahkan kontak penyedia IT',
+            // 'id_penerimaan_rinci.required' => 'id Rincian Penerimaan belum di ikutkan, silahkan kontak penyedia IT',
             'isi.required' => 'Isi per Satuan Besar Barang Harus Di isi.',
             'tgl_exprd.required' => 'Tanggal Expired Harus Di isi.',
             'satuan_k.required' => 'Satuan Kecil Harus Di isi.',
@@ -123,121 +123,121 @@ class ReturPembelianController extends Controller
             'harga.required' => 'Harga Harus Di isi.',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
-                $jumlahretur_k = 0;
-                $cekstok = 0;
-                $stoksekarang = 0;
-                $sisastok_k = 0;
-                $jumlahretur_k = (int) $validated['jumlahretur_b'] * (int) $validated['isi'];
+            $jumlahretur_k = 0;
+            $cekstok = 0;
+            $stoksekarang = 0;
+            $sisastok_k = 0;
+            $jumlahretur_k = (int) $validated['jumlahretur_b'] * (int) $validated['isi'];
 
-                    $cekstok = Stok::where('id_penerimaan_rinci', $request->id_penerimaan_rinci)->first();
-                    $stoksekarang = $cekstok->jumlah_k;
-                    $sisastok_k = $stoksekarang - $jumlahretur_k;
+            $cekstok = Stok::where('kode_barang', $request->kode_barang)->first();
+            $stoksekarang = $cekstok->jumlah_k;
+            $sisastok_k = $stoksekarang - $jumlahretur_k;
 
-                    if ($jumlahretur_k > $stoksekarang) {
-                        return new JsonResponse([
-                            'success' => false,
-                            'message' => 'Jumlah retur melebihi stok.',
-                        ], 410);
-                    }else{
-                        $cekstok->update(['jumlah_k' => $sisastok_k]);
-                    }
+            if ($jumlahretur_k > $stoksekarang) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Jumlah retur melebihi stok.',
+                ], 410);
+            } else {
+                $cekstok->update(['jumlah_k' => $sisastok_k]);
+            }
 
 
 
-                if (!$validated['noretur']) {
-                    DB::select('call noretur_penjualan(@nomor)');
-                    $nomor = DB::table('counter')->select('noretur_penjualan')->first();
+            if (!$validated['noretur']) {
+                DB::select('call noretur_penjualan(@nomor)');
+                $nomor = DB::table('counter')->select('noretur_penjualan')->first();
 
-                    $noretur = FormatingHelper::notrans($nomor->noretur_penjualan, 'RB');
-                } else {
-                    $noretur = $request->noretur;
+                $noretur = FormatingHelper::notrans($nomor->noretur_penjualan, 'RB');
+            } else {
+                $noretur = $request->noretur;
 
-                    // Cek apakah order sudah ada dan sudah terkunci
-                    $existingHeader = ReturPembelian_h::where('noretur', $noretur)->first();
-                    if ($existingHeader && $existingHeader->flag == '1') {
-                        return new JsonResponse([
-                            'success' => false,
-                            'message' => 'Data Order Sudah Terkunci'
-                        ], 403);
-                    }
-                }
-
-                $user = Auth::user();
-                $returheder = ReturPembelian_h::updateOrCreate(
-                    [
-                        'noretur' => $noretur,
-                    ],
-                    [
-                        'nopenerimaan' => $request->nopenerimaan,
-                        'nofaktur' => $request->nofaktur,
-                        'tglretur' => $request->tglretur,
-                        'kode_supplier' => $request->kode_supplier,
-                        'kode_user' => $user->kode,
-                    ]
-                );
-                if (!$returheder) {
-                    throw new \Exception('Gagal menyimpan Header Retur.');
-                }
-
-                if($validated['jenispajak'] === 'Exclude'){
-                    $pajakretur_rupiah = (int) $validated['harga_b'] * ($validated['pajak'] / 100);
-                }else{
-                    $pajakretur_rupiah = 0;
-                }
-                if (isset($validated['diskon_persen'])) {
-                    $diskonretur_rupiah = (int) $validated['harga_b'] * ($validated['diskon_persen'] / 100);
-                }else{
-                    $diskonretur_rupiah = 0;
-                }
-                $hargaretur_total = $validated['harga_b'] + $pajakretur_rupiah - $diskonretur_rupiah;
-                $subtotalretur = $hargaretur_total * $validated['jumlahretur_b'];
-                $returrinci = ReturPembelian_r::updateOrCreate(
-                    [
-                        'noretur' => $noretur,
-                        'kode_barang' => $validated['kode_barang'],
-                        'nobatch' => $validated['nobatch'],
-                    ],
-                    [
-                        'id_penerimaan_rinci' => $validated['id_penerimaan_rinci'],
-                        'isi' => $validated['isi'],
-                        'satuan_b' => $validated['satuan_b'],
-                        'satuan_k' => $validated['satuan_k'],
-                        'jumlah_b' => $validated['jumlah_b'],
-                        'jumlah_k' => $validated['jumlah_k'],
-                        'harga_b' => $validated['harga_b'],
-                        'harga' => $validated['harga'],
-                        'pajak_rupiah' => $request->pajak_rupiah,
-                        'diskon_persen' => $validated['diskon_persen'],
-                        'diskon_rupiah' => $request->diskon_rupiah,
-                        'harga_total' => $request->harga_total,
-                        'subtotal' => $request->subtotal,
-                        'tgl_exprd' => $validated['tgl_exprd'],
-                        'jumlahretur_b' => $validated['jumlahretur_b'],
-                        'jumlahretur_k' => $jumlahretur_k,
-                        'diskonretur_rupiah' => $diskonretur_rupiah,
-                        'pajakretur_rupiah' => $pajakretur_rupiah,
-                        'hargaretur_total' => $hargaretur_total,
-                        'subtotalretur' => $subtotalretur,
-                        'kode_user' => $user->kode,
-                    ]
-                );
-                if (!$returrinci) {
-                    throw new \Exception('Gagal menyimpan Rincian Retur.');
-                }
-                DB::commit();
-                    $returheder->load([
-                        'rincian' => function ($query) {
-                            $query->with(['barang']);
-                        },
-                        'suplier',
-                    ]);
+                // Cek apakah order sudah ada dan sudah terkunci
+                $existingHeader = ReturPembelian_h::where('noretur', $noretur)->first();
+                if ($existingHeader && $existingHeader->flag == '1') {
                     return new JsonResponse([
-                        'success' => true,
-                        'data' => $returheder,
-                        'message' => 'Data Retur Pembelian berhasil disimpan'
-                    ], 201);
+                        'success' => false,
+                        'message' => 'Data Order Sudah Terkunci'
+                    ], 403);
+                }
+            }
+
+            $user = Auth::user();
+            $returheder = ReturPembelian_h::updateOrCreate(
+                [
+                    'noretur' => $noretur,
+                ],
+                [
+                    'nopenerimaan' => $request->nopenerimaan,
+                    'nofaktur' => $request->nofaktur,
+                    'tglretur' => $request->tglretur,
+                    'kode_supplier' => $request->kode_supplier,
+                    'kode_user' => $user->kode,
+                ]
+            );
+            if (!$returheder) {
+                throw new \Exception('Gagal menyimpan Header Retur.');
+            }
+
+            if ($validated['jenispajak'] === 'Exclude') {
+                $pajakretur_rupiah = (int) $validated['harga_b'] * ($validated['pajak'] / 100);
+            } else {
+                $pajakretur_rupiah = 0;
+            }
+            if (isset($validated['diskon_persen'])) {
+                $diskonretur_rupiah = (int) $validated['harga_b'] * ($validated['diskon_persen'] / 100);
+            } else {
+                $diskonretur_rupiah = 0;
+            }
+            $hargaretur_total = $validated['harga_b'] + $pajakretur_rupiah - $diskonretur_rupiah;
+            $subtotalretur = $hargaretur_total * $validated['jumlahretur_b'];
+            $returrinci = ReturPembelian_r::updateOrCreate(
+                [
+                    'noretur' => $noretur,
+                    'kode_barang' => $validated['kode_barang'],
+                    'nobatch' => $validated['nobatch'],
+                ],
+                [
+                    'id_penerimaan_rinci' => $validated['id_penerimaan_rinci'],
+                    'isi' => $validated['isi'],
+                    'satuan_b' => $validated['satuan_b'],
+                    'satuan_k' => $validated['satuan_k'],
+                    'jumlah_b' => $validated['jumlah_b'],
+                    'jumlah_k' => $validated['jumlah_k'],
+                    'harga_b' => $validated['harga_b'],
+                    'harga' => $validated['harga'],
+                    'pajak_rupiah' => $request->pajak_rupiah,
+                    'diskon_persen' => $validated['diskon_persen'],
+                    'diskon_rupiah' => $request->diskon_rupiah,
+                    'harga_total' => $request->harga_total,
+                    'subtotal' => $request->subtotal,
+                    'tgl_exprd' => $validated['tgl_exprd'],
+                    'jumlahretur_b' => $validated['jumlahretur_b'],
+                    'jumlahretur_k' => $jumlahretur_k,
+                    'diskonretur_rupiah' => $diskonretur_rupiah,
+                    'pajakretur_rupiah' => $pajakretur_rupiah,
+                    'hargaretur_total' => $hargaretur_total,
+                    'subtotalretur' => $subtotalretur,
+                    'kode_user' => $user->kode,
+                ]
+            );
+            if (!$returrinci) {
+                throw new \Exception('Gagal menyimpan Rincian Retur.');
+            }
+            DB::commit();
+            $returheder->load([
+                'rincian' => function ($query) {
+                    $query->with(['barang']);
+                },
+                'suplier',
+            ]);
+            return new JsonResponse([
+                'success' => true,
+                'data' => $returheder,
+                'message' => 'Data Retur Pembelian berhasil disimpan'
+            ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -279,7 +279,7 @@ class ReturPembelianController extends Controller
                 'success' => true,
                 'message' => 'Data Retur berhasil dihapus'
             ]);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             return new JsonResponse([
                 'success' => false,
