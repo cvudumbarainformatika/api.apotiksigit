@@ -111,7 +111,8 @@ class PenjualanController extends Controller
                 $q->whereBetween('tgl_penjualan', [$req['from'] . ' 00:00:00', $req['to'] . ' 23:59:59']);
             })
             ->with([
-                'rinci.master:nama,kode,satuan_k,satuan_b,isi,kandungan'
+                'rinci.master:nama,kode,satuan_k,satuan_b,isi,kandungan',
+                'pelanggan'
             ])
             ->orderBy($req['order_by'], $req['sort']);
         $totalCount = (clone $raw)->count();
@@ -209,7 +210,8 @@ class PenjualanController extends Controller
             }
             DB::commit();
             $data->load([
-                'rinci.master:nama,kode,satuan_k,satuan_b,isi,kandungan'
+                'rinci.master:nama,kode,satuan_k,satuan_b,isi,kandungan',
+                'pelanggan'
             ]);
             return new JsonResponse([
                 'message' => 'Data berhasil disimpan',
