@@ -136,6 +136,7 @@ class OrderController extends Controller
                 [
                     'kode_user' => $user->kode,
                     'kode_supplier' => $validated['kode_supplier'],
+                    'kode_depo' => $validated['kode_depo'],
                     'tgl_order' => $validated['tgl_order'] ?? now(),
                 ]
             );
