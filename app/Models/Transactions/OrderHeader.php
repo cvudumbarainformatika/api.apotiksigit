@@ -2,6 +2,7 @@
 
 namespace App\Models\Transactions;
 
+use App\Models\Master\Cabang;
 use App\Models\Master\Supplier;
 use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,6 +26,10 @@ class OrderHeader extends Model
 
     public function penerimaan()
     {
-        return $this->belongsTo(Penerimaan_h::class,'nomor_order', 'noorder');
+        return $this->belongsTo(Penerimaan_h::class, 'nomor_order', 'noorder');
+    }
+    public function cabang()
+    {
+        return $this->belongsTo(Cabang::class, 'kode_depo', 'kode');
     }
 }
