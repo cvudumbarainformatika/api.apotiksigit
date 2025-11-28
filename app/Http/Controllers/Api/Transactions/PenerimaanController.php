@@ -30,8 +30,8 @@ class PenerimaanController extends Controller
             ->when(request('q'), function ($q) {
                 $q->where(function ($query) {
                     $query->where('penerimaan_hs.nopenerimaan', 'like', '%' . request('q') . '%')
-                            ->orWhere('penerimaan_hs.noorder', 'like', '%' . request('q') . '%')
-                            ->orWhere('suppliers.nama', 'like', '%' . request('q') . '%');
+                        ->orWhere('penerimaan_hs.noorder', 'like', '%' . request('q') . '%')
+                        ->orWhere('suppliers.nama', 'like', '%' . request('q') . '%');
                 });
             })
             ->with([
@@ -62,8 +62,8 @@ class PenerimaanController extends Controller
             'jenispajak' => 'required',
             'pajak' => 'nullable',
             'kode_barang' => 'required',
-            'nobatch' => 'required',
-            'tgl_exprd' => 'required',
+            'nobatch' => 'nullable',
+            'tgl_exprd' => 'nullable',
             'jumlah_b' => 'required',
             'jumlah_k' => 'required',
             'harga_b' => 'required',
@@ -85,8 +85,8 @@ class PenerimaanController extends Controller
             'kode_suplier.required' => 'Kode Supplier Harus Di isi.',
             'jenispajak.required' => 'Jenis Pajak Harus Di isi.',
             'kode_barang.required' => 'Kode Barang Harus Di isi.',
-            'nobatch.required' => 'No. Batch Harus Di isi.',
-            'tgl_exprd.required' => 'Tanggal Expired Harus Di isi.',
+            // 'nobatch.required' => 'No. Batch Harus Di isi.',
+            // 'tgl_exprd.required' => 'Tanggal Expired Harus Di isi.',
             'isi.required' => 'Isi per Satuan Besar Barang Harus Di isi.',
             'jumlah_b.required' => 'Jumlah Satuan Besar Harus Di isi.',
             'jumlah_k.required' => 'Jumlah Satuan Kecil Harus Di isi.',
@@ -159,7 +159,7 @@ class PenerimaanController extends Controller
             $diskon_rupiah_heder = 0;
             $harga_k = $validated['harga_b'] / $validated['isi'];
             // $harga_k = $request->harga / $validated['jumlah_k'];
-            if($validated['jenispajak'] === 'Exclude'){
+            if ($validated['jenispajak'] === 'Exclude') {
                 $pajak_rupiah = $harga_k * ($validated['pajak'] / 100);
             }
             if (isset($validated['diskon_persen'])) {
@@ -177,8 +177,8 @@ class PenerimaanController extends Controller
                     'nopenerimaan' => $nopenerimaan,
                     'noorder' => $validated['noorder'],
                     'kode_barang' => $validated['kode_barang'],
-                    'nobatch' => $validated['nobatch'],
-                    'tgl_exprd' => $validated['tgl_exprd'],
+                    'nobatch' => $validated['nobatch'] ?? '',
+                    'tgl_exprd' => $validated['tgl_exprd'] ?? null,
                     'isi' => $validated['isi'],
                     'satuan_b' => $validated['satuan_b'],
                     'satuan_k' => $validated['satuan_k'],
@@ -228,7 +228,6 @@ class PenerimaanController extends Controller
 
             ], 410);
         }
-
     }
 
     public function hapus(Request $request)
@@ -287,36 +286,36 @@ class PenerimaanController extends Controller
 
         try {
             DB::beginTransaction();
-                $existingHeader->update(['flag' => '1']);
-                //  Penerimaan_h::where('nopenerimaan', $validated['nopenerimaan'])->update(['flag' => '1']);
-                // $user = Auth::user();
-                $requestData = $request->payload;
-                foreach ($requestData as $key => $value) {
-                    Stok::updateOrCreate(
-                        [
-                            'kode_barang' => $value['kode_barang'],
-                            'kode_depo' => $validated['kode_depo'],
-                        ],
-                        [
-                            'jumlah_k' => DB::raw('COALESCE(jumlah_k, 0) + ' . $value['jumlah_k']),
-                            'satuan_k' => $value['satuan_k'], // default kalau kosong
-                        ]
-                    );
-                    // $cek = Stok::where('kode_barang', $value['kode_barang'])->count();
-                    // if ($cek > 0) {
-                    //     $stok = Stok::where('kode_barang', $value['kode_barang'])->where('kode_depo', $kode_depo)->first();
-                    //     $stok->update([
-                    //         // 'jumlah_b' => $stok->jumlah_b + $value['jumlah_b'],
-                    //         'jumlah_k' => $stok->jumlah_k + $value['jumlah_k'],
-                    //     ]);
-                    // } else {
-                    //     $stok = Stok::create([
-                    //         'kode_barang' => $value['kode_barang'],
-                    //         'kode_depo' => $kode_depo,
-                    //         // 'jumlah_b' => $value['jumlah_b'],
-                    //         'jumlah_k' => $value['jumlah_k'],
-                    //     ]);
-                    // }
+            $existingHeader->update(['flag' => '1']);
+            //  Penerimaan_h::where('nopenerimaan', $validated['nopenerimaan'])->update(['flag' => '1']);
+            // $user = Auth::user();
+            $requestData = $request->payload;
+            foreach ($requestData as $key => $value) {
+                Stok::updateOrCreate(
+                    [
+                        'kode_barang' => $value['kode_barang'],
+                        'kode_depo' => $validated['kode_depo'],
+                    ],
+                    [
+                        'jumlah_k' => DB::raw('COALESCE(jumlah_k, 0) + ' . $value['jumlah_k']),
+                        'satuan_k' => $value['satuan_k'], // default kalau kosong
+                    ]
+                );
+                // $cek = Stok::where('kode_barang', $value['kode_barang'])->count();
+                // if ($cek > 0) {
+                //     $stok = Stok::where('kode_barang', $value['kode_barang'])->where('kode_depo', $kode_depo)->first();
+                //     $stok->update([
+                //         // 'jumlah_b' => $stok->jumlah_b + $value['jumlah_b'],
+                //         'jumlah_k' => $stok->jumlah_k + $value['jumlah_k'],
+                //     ]);
+                // } else {
+                //     $stok = Stok::create([
+                //         'kode_barang' => $value['kode_barang'],
+                //         'kode_depo' => $kode_depo,
+                //         // 'jumlah_b' => $value['jumlah_b'],
+                //         'jumlah_k' => $value['jumlah_k'],
+                //     ]);
+                // }
                 // Stok::create(
                 //         [
                 //             'nopenerimaan' => $value['nopenerimaan'],
@@ -339,16 +338,16 @@ class PenerimaanController extends Controller
                 //             'kode_user' => $user->kode,
                 //         ]
                 //     );
-                }
+            }
 
-                $existingHeader->load([
-                    'rincian' => function ($query) {
-                        $query->with(['barang']);
-                    },
-                    'suplier',
-                ]);
+            $existingHeader->load([
+                'rincian' => function ($query) {
+                    $query->with(['barang']);
+                },
+                'suplier',
+            ]);
 
-        DB::commit();
+            DB::commit();
 
             return new JsonResponse([
                 'success' => true,
