@@ -368,6 +368,18 @@ class DatabaseSeeder extends Seeder
                 'component' => 'IndexPage',
             ]
         );
+        $laporan->children()->updateOrCreate(
+            [
+                'title' => 'Laporan Fast Moving',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/laporan/fastmoving',
+                'name' => 'laporan.fastmoving',
+                'view' => '/views/laporan/fastmoving',
+                'component' => 'IndexPage',
+            ]
+        );
         //  Setting
         $setting = Menu::firstOrCreate(
             ['title' => 'Settings'],
