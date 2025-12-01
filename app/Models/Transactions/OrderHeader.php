@@ -30,6 +30,6 @@ class OrderHeader extends Model
     }
     public function cabang()
     {
-        return $this->belongsTo(Cabang::class, 'kode_depo', 'kode');
+        return $this->belongsTo(Cabang::class, 'kode_depo', 'kodecabang');
     }
 }
