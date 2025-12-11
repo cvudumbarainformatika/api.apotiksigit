@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Transactions\StokOpnameController;
 use App\Http\Controllers\DataMigration\CekDataController;
 use App\Models\Master\Barang;
 use App\Models\OldApp\Master\Product;
@@ -43,3 +44,4 @@ Route::get('/test-curl', function () {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
+Route::get('/opname', [StokOpnameController::class, 'simpan']);
