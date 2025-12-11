@@ -31,7 +31,9 @@ class BarangController extends Controller
             ->whereNull('hidden')
             ->orderBy($req['order_by'], $req['sort']);
         $totalCount = (clone $raw)->count();
-        $data = $raw->with('failed')->simplePaginate($req['per_page']);
+        $data = $raw
+            ->with('failed')
+            ->simplePaginate($req['per_page']);
 
 
         $resp = ResponseHelper::responseGetSimplePaginate($data, $req, $totalCount);
@@ -96,7 +98,6 @@ class BarangController extends Controller
         $data->load('failed');
         return new JsonResponse([
             'data' => $data,
-            'kirim' => $kirim,
             'message' => 'Data barang berhasil disimpan'
         ], 410);
     }
@@ -125,13 +126,11 @@ class BarangController extends Controller
             $cabang = Cabang::whereIn('url', $urls)->pluck('namacabang')->implode(', ');
             return new JsonResponse([
                 'data' => $data,
-                'kirim' => $kirim,
                 'message' => 'Data barang di cabang ' . $cabang . ' gagal dihapus'
             ], 410);
         }
         return new JsonResponse([
             'data' => $data,
-            'kirim' => $kirim,
             'message' => 'Data barang berhasil dihapus'
         ]);
     }

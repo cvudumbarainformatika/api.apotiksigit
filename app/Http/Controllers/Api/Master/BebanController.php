@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\Master;
 
 use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
+use App\Helpers\Send\MasterHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Master\Beban;
+use App\Models\Master\Cabang;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -29,7 +31,9 @@ class BebanController extends Controller
         })->where('flag', '')
             ->orderBy($req['order_by'], $req['sort']);
         $totalCount = (clone $raw)->count();
-        $data = $raw->simplePaginate($req['per_page']);
+        $data = $raw
+            // ->with('failed')
+            ->simplePaginate($req['per_page']);
 
         $resp = ResponseHelper::responseGetSimplePaginate($data, $req, $totalCount);
         return new JsonResponse($resp);
@@ -37,6 +41,13 @@ class BebanController extends Controller
 
     public function store(Request $request)
     {
+        // $cek = MasterHelper::isGundangHere();
+        // if (!$cek) {
+        //     return new JsonResponse([
+        //         'cabang' => $cek,
+        //         'message' => 'Perubahan data Master hanya bisa dilakukan di cabang gundang'
+        //     ], 410);
+        // }
         $validated = $request->validate([
             'nama' => 'required',
         ], [
@@ -52,10 +63,19 @@ class BebanController extends Controller
         );
         $kode = FormatingHelper::genKodeBarang($data->id, 'BBN');
         $data->update(['kode' => $kode]);
+
+        // $dataTosend = [
+        //     'kode' => $kode,
+        //     'action' => 'simpan',
+        //     'model' => 'barang',
+        //     'data' => $data
+        // ];
+        // $kirim = MasterHelper::sendMaster($dataTosend);
+        // $data->load('failed');
         return new JsonResponse([
             'data' => $data,
-            'message' => 'Data Beban berhasil disimpan'
-        ]);
+            'message' => 'Data barang berhasil disimpan'
+        ], 410);
     }
 
     public function hapus(Request $request)
@@ -66,10 +86,31 @@ class BebanController extends Controller
                 'message' => 'Data Beban tidak ditemukan'
             ], 410);
         }
-        $data->update(['flag' => '1']);
+        // $data->update(['flag' => '1']);
+        // $dataTosend = [
+        //     'kode' => $data->kode,
+        //     'action' => 'hapus',
+        //     'model' => 'barang',
+        //     'data' => $data
+        // ];
+        // $kirim = MasterHelper::sendMaster($dataTosend);
+        // $failed = $kirim['fails'];
+
+        // if (empty($failed)) {
+        $data->update(['hidden' => '1']);
+        // } else {
+        //     $urls = array_column($failed, 'url');
+        //     $cabang = Cabang::whereIn('url', $urls)->pluck('namacabang')->implode(', ');
+        //     return new JsonResponse([
+        //         'data' => $data,
+        //         'kirim' => $kirim,
+        //         'message' => 'Data barang di cabang ' . $cabang . ' gagal dihapus'
+        //     ], 410);
+        // }
         return new JsonResponse([
             'data' => $data,
-            'message' => 'Data Beban berhasil dihapus'
+            // 'kirim' => $kirim,
+            'message' => 'Data barang berhasil dihapus'
         ]);
     }
 }

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\Master;
 
 use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
+use App\Helpers\Send\MasterHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Master\Cabang;
 use App\Models\Master\KategoriExpired;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,7 +29,9 @@ class KetegoriExpiredController extends Controller
         })
             ->orderBy($req['order_by'], $req['sort']);
         $totalCount = (clone $raw)->count();
-        $data = $raw->simplePaginate($req['per_page']);
+        $data = $raw
+            // ->with('failed')
+            ->simplePaginate($req['per_page']);
 
 
         $resp = ResponseHelper::responseGetSimplePaginate($data, $req, $totalCount);
@@ -36,6 +40,13 @@ class KetegoriExpiredController extends Controller
 
     public function store(Request $request)
     {
+        // $cek = MasterHelper::isGundangHere();
+        // if (!$cek) {
+        //     return new JsonResponse([
+        //         'cabang' => $cek,
+        //         'message' => 'Perubahan data Master hanya bisa dilakukan di cabang gundang'
+        //     ], 410);
+        // }
         $kode = $request->kode;
         $validated = $request->validate([
             'nama' => 'required',
@@ -55,29 +66,57 @@ class KetegoriExpiredController extends Controller
             $kode = FormatingHelper::genKodeBarang($nomor->kode_kategori, 'EXP');
         }
 
-        $barang = KategoriExpired::updateOrCreate(
+        $data = KategoriExpired::updateOrCreate(
             [
                 'kode' =>  $kode
             ],
             $validated
         );
+
+        // $dataTosend = [
+        //     'kode' => $kode,
+        //     'action' => 'simpan',
+        //     'model' => 'barang',
+        //     'data' => $data
+        // ];
+        // $kirim = MasterHelper::sendMaster($dataTosend);
+        // $data->load('failed');
         return new JsonResponse([
-            'data' => $barang,
+            'data' => $data,
             'message' => 'Data barang berhasil disimpan'
-        ]);
+        ], 410);
     }
 
     public function hapus(Request $request)
     {
-        $barang = KategoriExpired::find($request->id);
-        if (!$barang) {
+        $data = KategoriExpired::find($request->id);
+        if (!$data) {
             return new JsonResponse([
-                'message' => 'Data barang tidak ditemukan'
+                'message' => 'Data kategori tidak ditemukan'
             ], 410);
         }
-        $barang->update(['hidden' => '1']);
+
+        // $dataTosend = [
+        //     'kode' => $data->kode,
+        //     'action' => 'hapus',
+        //     'model' => 'barang',
+        //     'data' => $data
+        // ];
+        // $kirim = MasterHelper::sendMaster($dataTosend);
+        // $failed = $kirim['fails'];
+
+        // if (empty($failed)) {
+        $data->update(['hidden' => '1']);
+        // } else {
+        //     $urls = array_column($failed, 'url');
+        //     $cabang = Cabang::whereIn('url', $urls)->pluck('namacabang')->implode(', ');
+        //     return new JsonResponse([
+        //         'data' => $data,
+        //         'message' => 'Data barang di cabang ' . $cabang . ' gagal dihapus'
+        //     ], 410);
+        // }
         return new JsonResponse([
-            'data' => $barang,
+            'data' => $data,
             'message' => 'Data barang berhasil dihapus'
         ]);
     }
