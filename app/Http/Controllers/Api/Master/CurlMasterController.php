@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api\Master;
 
+use App\Helpers\Send\MasterHelper;
 use App\Http\Controllers\Controller;
+use App\Models\FailedToSend;
 use App\Models\Master\Barang;
 use App\Models\Master\Beban;
 use App\Models\Master\Dokter;
@@ -130,5 +132,14 @@ class CurlMasterController extends Controller
             'message' => 'Data barang sudah di hapus',
             'code' => 200
         ];
+    }
+    public function reSendAll()
+    {
+        $data = FailedToSend::get();
+        $resp = MasterHelper::reSendMaster($data);
+        return new JsonResponse([
+            'resp' => $resp,
+            'data' => $data,
+        ]);
     }
 }

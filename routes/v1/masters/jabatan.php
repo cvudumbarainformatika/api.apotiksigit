@@ -11,4 +11,5 @@ Route::group([
     Route::get('/get-list', [JabatanController::class, 'index']);
     Route::post('/simpan', [JabatanController::class, 'store']);
     Route::post('/delete', [JabatanController::class, 'hapus']);
+    // Route::post('/kirim-ulang', [JabatanController::class, 'reSend']);
 });

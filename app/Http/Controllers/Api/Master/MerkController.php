@@ -6,6 +6,7 @@ use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
 use App\Helpers\Send\MasterHelper;
 use App\Http\Controllers\Controller;
+use App\Models\FailedToSend;
 use App\Models\Master\Cabang;
 use App\Models\Master\Merk;
 use Illuminate\Http\JsonResponse;
@@ -89,7 +90,7 @@ class MerkController extends Controller
         $dataTosend = [
             'kode' => $data->kode,
             'action' => 'hapus',
-            'model' => 'barang',
+            'model' => 'merk',
             'data' => $data
         ];
         $kirim = MasterHelper::sendMaster($dataTosend);
@@ -103,13 +104,24 @@ class MerkController extends Controller
             return new JsonResponse([
                 'data' => $data,
                 'kirim' => $kirim,
-                'message' => 'Data barang di cabang ' . $cabang . ' gagal dihapus'
+                'message' => 'Data merk di cabang ' . $cabang . ' gagal dihapus'
             ], 410);
         }
         return new JsonResponse([
             'data' => $data,
             'kirim' => $kirim,
-            'message' => 'Data barang berhasil dihapus'
+            'message' => 'Data merk berhasil dihapus'
+        ]);
+    }
+    public function reSend(Request $request)
+    {
+
+        $data = FailedToSend::where('kode', $request->kode)->where('model', 'merk')->get();
+        $resp = MasterHelper::reSendMaster($data);
+        return new JsonResponse([
+            'req' => $request->all(),
+            'resp' => $resp,
+            'data' => $data,
         ]);
     }
 }

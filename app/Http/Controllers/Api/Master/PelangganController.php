@@ -6,6 +6,7 @@ use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
 use App\Helpers\Send\MasterHelper;
 use App\Http\Controllers\Controller;
+use App\Models\FailedToSend;
 use App\Models\Master\Cabang;
 use App\Models\Master\Pelanggan;
 use Illuminate\Http\JsonResponse;
@@ -77,14 +78,14 @@ class PelangganController extends Controller
         // $dataTosend = [
         //     'kode' => $kode,
         //     'action' => 'simpan',
-        //     'model' => 'barang',
+        //     'model' => 'pelanggan',
         //     'data' => $data
         // ];
         // $kirim = MasterHelper::sendMaster($dataTosend);
         // $data->load('failed');
         return new JsonResponse([
             'data' => $data,
-            'message' => 'Data barang berhasil disimpan'
+            'message' => 'Data pelanggan berhasil disimpan'
         ], 410);
     }
 
@@ -100,7 +101,7 @@ class PelangganController extends Controller
         // $dataTosend = [
         //     'kode' => $data->kode,
         //     'action' => 'hapus',
-        //     'model' => 'barang',
+        //     'model' => 'pelanggan',
         //     'data' => $data
         // ];
         // $kirim = MasterHelper::sendMaster($dataTosend);
@@ -113,7 +114,7 @@ class PelangganController extends Controller
         //     $cabang = Cabang::whereIn('url', $urls)->pluck('namacabang')->implode(', ');
         //     return new JsonResponse([
         //         'data' => $data,
-        //         'message' => 'Data barang di cabang ' . $cabang . ' gagal dihapus'
+        //         'message' => 'Data pelanggan di cabang ' . $cabang . ' gagal dihapus'
         //     ], 410);
         // }
         return new JsonResponse([
@@ -121,4 +122,15 @@ class PelangganController extends Controller
             'message' => 'Data barang berhasil dihapus'
         ]);
     }
+    // public function reSend(Request $request)
+    // {
+
+    //     $data = FailedToSend::where('kode', $request->kode)->where('model', 'pelanggan')->get();
+    //     $resp = MasterHelper::reSendMaster($data);
+    //     return new JsonResponse([
+    //         'req' => $request->all(),
+    //         'resp' => $resp,
+    //         'data' => $data,
+    //     ]);
+    // }
 }

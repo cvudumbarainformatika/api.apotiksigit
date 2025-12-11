@@ -59,6 +59,44 @@ class MasterHelper
             'fails' => $fails,
         ];
     }
+    public static function reSendMaster($request)
+    {
+
+
+        $success = [];
+        foreach ($request as $key) {
+            $data = [
+                'kode' => $key->kode,
+                'action' => $key->action,
+                'model' => $key->model,
+                'data' => $key->request,
+            ];
+            $resp = self::kirim($key->url, $data);
+            $kirims[] = $resp;
+            // $code = $resp['resp']['code'];
+            $code = data_get($resp, 'resp.code');
+            $codes[] = $code;
+            if (in_array($code, [200, 201])) {
+                $ada = unserialize(serialize($key));
+                $ada['resp'] = $resp;
+                $success[] = $ada;
+            }
+        }
+        if (!empty($success)) {
+            foreach ($success as $key) {
+                $failed = FailedToSend::find($key->id);
+                if ($failed) {
+                    $failed->delete();
+                }
+                // return $failed;
+            }
+        }
+        return [
+            'kirima' => $kirims,
+            'codes' => $codes,
+            'success' => $success,
+        ];
+    }
     public static function kirim($url, $data)
     {
         try {

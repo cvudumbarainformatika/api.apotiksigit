@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Master\CurlMasterController;
 use App\Http\Controllers\Api\Transactions\StokOpnameController;
 use App\Http\Controllers\DataMigration\CekDataController;
 use App\Models\Master\Barang;
@@ -45,3 +46,4 @@ Route::get('/test-curl', function () {
     }
 });
 Route::get('/opname', [StokOpnameController::class, 'simpan']);
+Route::get('/curl-resend-all', [CurlMasterController::class, 'reSendAll']);

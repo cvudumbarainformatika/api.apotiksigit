@@ -11,4 +11,5 @@ Route::group([
     Route::get('/get-list', [PelangganController::class, 'index']);
     Route::post('/simpan', [PelangganController::class, 'store']);
     Route::post('/delete', [PelangganController::class, 'hapus']);
+    // Route::post('/kirim-ulang', [PelangganController::class, 'reSend']);
 });

@@ -6,6 +6,7 @@ use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
 use App\Helpers\Send\MasterHelper;
 use App\Http\Controllers\Controller;
+use App\Models\FailedToSend;
 use App\Models\Master\Barang;
 use App\Models\Master\Cabang;
 use Illuminate\Http\JsonResponse;
@@ -132,6 +133,17 @@ class BarangController extends Controller
         return new JsonResponse([
             'data' => $data,
             'message' => 'Data barang berhasil dihapus'
+        ]);
+    }
+    public function reSend(Request $request)
+    {
+
+        $data = FailedToSend::where('kode', $request->kode)->where('model', 'barang')->get();
+        $resp = MasterHelper::reSendMaster($data);
+        return new JsonResponse([
+            'req' => $request->all(),
+            'resp' => $resp,
+            'data' => $data,
         ]);
     }
 }

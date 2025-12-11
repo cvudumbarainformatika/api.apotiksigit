@@ -11,4 +11,5 @@ Route::group([
     Route::get('/get-list', [DokterController::class, 'index']);
     Route::post('/simpan', [DokterController::class, 'store']);
     Route::post('/delete', [DokterController::class, 'hapus']);
+    // Route::post('/kirim-ulang', [DokterController::class, 'reSend']);
 });

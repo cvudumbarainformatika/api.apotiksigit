@@ -6,6 +6,7 @@ use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
 use App\Helpers\Send\MasterHelper;
 use App\Http\Controllers\Controller;
+use App\Models\FailedToSend;
 use App\Models\Master\Cabang;
 use App\Models\Master\Rak;
 use Illuminate\Http\JsonResponse;
@@ -74,14 +75,14 @@ class RakController extends Controller
         $dataTosend = [
             'kode' => $kode,
             'action' => 'simpan',
-            'model' => 'barang',
+            'model' => 'rak',
             'data' => $data
         ];
         $kirim = MasterHelper::sendMaster($dataTosend);
         $data->load('failed');
         return new JsonResponse([
             'data' => $data,
-            'message' => 'Data barang berhasil disimpan'
+            'message' => 'Data rak berhasil disimpan'
         ], 410);
     }
 
@@ -97,7 +98,7 @@ class RakController extends Controller
         $dataTosend = [
             'kode' => $data->kode,
             'action' => 'hapus',
-            'model' => 'barang',
+            'model' => 'rak',
             'data' => $data
         ];
         $kirim = MasterHelper::sendMaster($dataTosend);
@@ -110,12 +111,23 @@ class RakController extends Controller
             $cabang = Cabang::whereIn('url', $urls)->pluck('namacabang')->implode(', ');
             return new JsonResponse([
                 'data' => $data,
-                'message' => 'Data barang di cabang ' . $cabang . ' gagal dihapus'
+                'message' => 'Data rak di cabang ' . $cabang . ' gagal dihapus'
             ], 410);
         }
         return new JsonResponse([
             'data' => $data,
-            'message' => 'Data barang berhasil dihapus'
+            'message' => 'Data rak berhasil dihapus'
+        ]);
+    }
+    public function reSend(Request $request)
+    {
+
+        $data = FailedToSend::where('kode', $request->kode)->where('model', 'rak')->get();
+        $resp = MasterHelper::reSendMaster($data);
+        return new JsonResponse([
+            'req' => $request->all(),
+            'resp' => $resp,
+            'data' => $data,
         ]);
     }
 }

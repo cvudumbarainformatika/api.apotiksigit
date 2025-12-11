@@ -11,4 +11,5 @@ Route::group([
     Route::get('/get-list', [SatuanController::class, 'index']);
     Route::post('/simpan', [SatuanController::class, 'store']);
     Route::post('/delete', [SatuanController::class, 'hapus']);
+    Route::post('/kirim-ulang', [SatuanController::class, 'reSend']);
 });

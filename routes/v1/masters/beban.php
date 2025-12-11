@@ -11,4 +11,5 @@ Route::group([
     Route::get('/get-list', [BebanController::class, 'index']);
     Route::post('/simpan', [BebanController::class, 'store']);
     Route::post('/delete', [BebanController::class, 'hapus']);
+    // Route::post('/kirim-ulang', [BebanController::class, 'reSend']);
 });

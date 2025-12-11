@@ -11,4 +11,5 @@ Route::group([
     Route::get('/get-list', [BarangController::class, 'index']);
     Route::post('/simpan', [BarangController::class, 'store']);
     Route::post('/delete', [BarangController::class, 'hapus']);
+    Route::post('/kirim-ulang', [BarangController::class, 'reSend']);
 });

@@ -6,6 +6,7 @@ use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
 use App\Helpers\Send\MasterHelper;
 use App\Http\Controllers\Controller;
+use App\Models\FailedToSend;
 use App\Models\Master\Beban;
 use App\Models\Master\Cabang;
 use Illuminate\Http\JsonResponse;
@@ -67,14 +68,14 @@ class BebanController extends Controller
         // $dataTosend = [
         //     'kode' => $kode,
         //     'action' => 'simpan',
-        //     'model' => 'barang',
+        //     'model' => 'beban',
         //     'data' => $data
         // ];
         // $kirim = MasterHelper::sendMaster($dataTosend);
         // $data->load('failed');
         return new JsonResponse([
             'data' => $data,
-            'message' => 'Data barang berhasil disimpan'
+            'message' => 'Data beban berhasil disimpan'
         ], 410);
     }
 
@@ -90,7 +91,7 @@ class BebanController extends Controller
         // $dataTosend = [
         //     'kode' => $data->kode,
         //     'action' => 'hapus',
-        //     'model' => 'barang',
+        //     'model' => 'beban',
         //     'data' => $data
         // ];
         // $kirim = MasterHelper::sendMaster($dataTosend);
@@ -113,4 +114,15 @@ class BebanController extends Controller
             'message' => 'Data barang berhasil dihapus'
         ]);
     }
+    // public function reSend(Request $request)
+    // {
+
+    //     $data = FailedToSend::where('kode', $request->kode)->where('model', 'beban')->get();
+    //     $resp = MasterHelper::reSendMaster($data);
+    //     return new JsonResponse([
+    //         'req' => $request->all(),
+    //         'resp' => $resp,
+    //         'data' => $data,
+    //     ]);
+    // }
 }
