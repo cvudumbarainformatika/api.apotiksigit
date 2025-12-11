@@ -2,6 +2,7 @@
 
 namespace App\Models\Master;
 
+use App\Models\FailedToSend;
 use App\Models\Transactions\Beban_r;
 use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,5 +17,10 @@ class Beban extends Model
     public function rincian()
     {
         return $this->hasMany(Beban_r::class, 'kode_beban', 'id');
+    }
+    // cek failed simpan di kirim master ke cabang
+    public function failed()
+    {
+        return $this->hasMany(FailedToSend::class, 'kode', 'kode')->where('model', 'beban');
     }
 }

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\Master;
 
 use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
+use App\Helpers\Send\MasterHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Master\Cabang;
 use App\Models\Master\Merk;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,7 +33,7 @@ class MerkController extends Controller
         })->whereNull('hidden')
             ->orderBy($req['order_by'], $req['sort']);
         $totalCount = (clone $raw)->count();
-        $data = $raw->simplePaginate($req['per_page']);
+        $data = $raw->with('failed')->simplePaginate($req['per_page']);
 
         $resp = ResponseHelper::responseGetSimplePaginate($data, $req, $totalCount);
         return new JsonResponse($resp);
@@ -60,8 +62,17 @@ class MerkController extends Controller
             ],
             $validated
         );
+        $dataTosend = [
+            'kode' => $kode,
+            'action' => 'simpan',
+            'model' => 'merk',
+            'data' => $data
+        ];
+        $kirim = MasterHelper::sendMaster($dataTosend);
+        $data->load('failed');
         return new JsonResponse([
             'data' => $data,
+            'kirim' => $kirim,
             'message' => 'Data Merk berhasil disimpan'
         ]);
     }
@@ -74,10 +85,31 @@ class MerkController extends Controller
                 'message' => 'Data Merk tidak ditemukan'
             ], 410);
         }
-        $data->update(['hidden' => '1']);
+
+        $dataTosend = [
+            'kode' => $data->kode,
+            'action' => 'hapus',
+            'model' => 'barang',
+            'data' => $data
+        ];
+        $kirim = MasterHelper::sendMaster($dataTosend);
+        $failed = $kirim['fails'];
+
+        if (empty($failed)) {
+            $data->update(['hidden' => '1']);
+        } else {
+            $urls = array_column($failed, 'url');
+            $cabang = Cabang::whereIn('url', $urls)->pluck('namacabang')->implode(', ');
+            return new JsonResponse([
+                'data' => $data,
+                'kirim' => $kirim,
+                'message' => 'Data barang di cabang ' . $cabang . ' gagal dihapus'
+            ], 410);
+        }
         return new JsonResponse([
             'data' => $data,
-            'message' => 'Data Merk berhasil dihapus'
+            'kirim' => $kirim,
+            'message' => 'Data barang berhasil dihapus'
         ]);
     }
 }
