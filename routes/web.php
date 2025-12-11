@@ -46,4 +46,4 @@ Route::get('/test-curl', function () {
     }
 });
 Route::get('/opname', [StokOpnameController::class, 'simpan']);
-Route::get('/curl-resend-all', [CurlMasterController::class, 'reSendAll']);
+// Route::get('/curl-resend-all', [CurlMasterController::class, 'reSendAll']);
