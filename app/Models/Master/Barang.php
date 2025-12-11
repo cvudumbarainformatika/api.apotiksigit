@@ -2,6 +2,7 @@
 
 namespace App\Models\Master;
 
+use App\Models\FailedToSend;
 use App\Models\Transactions\MutasiRequest;
 use App\Models\Transactions\Penerimaan_r;
 use App\Models\Transactions\PenjualanR;
@@ -20,10 +21,17 @@ class Barang extends Model
     protected $guarded = ['id'];
     protected $hidden = ['updated_at', 'created_at'];
 
+    // cek failed simpan di kirim master ke cabang
+    public function failed()
+    {
+        return $this->hasMany(FailedToSend::class, 'kode', 'kode')->where('model', 'barang');
+    }
+
     public function penjualanRinci()
     {
         return $this->hasMany(PenjualanR::class, 'kode_barang', 'kode');
     }
+
     public function returPenjualanRinci()
     {
         return $this->hasMany(ReturPenjualan_r::class, 'kode_barang', 'kode');
