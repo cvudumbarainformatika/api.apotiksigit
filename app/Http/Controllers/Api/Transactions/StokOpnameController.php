@@ -210,15 +210,17 @@ class StokOpnameController extends Controller
 
             $stok = $key->stok ? $key->stok->firstWhere('kode_depo', 'APS0000') : null;
             $items[] = $stok;
-            $stokAwalGud = $key->stokAwal ? $key->stokAwal->where('kode_depo', 'APS0000')->sum('jumlah_k') : 0;
+            $stokAwalGud = !empty($key->stok_awal) ? $key->stok_awal->where('kode_depo', 'APS0000')->sum('jumlah_k') : 0;
             $penerimaan = $key->penerimaanRinci ? $key->penerimaanRinci->sum('jumlah_k') : 0;
             $returPembelian = $key->returPembelianRinci ? $key->returPembelianRinci->sum('jumlah_k') : 0;
             $mutasiMasuk = $key->mutasiMasuk ? $key->mutasiMasuk->where('dari', 'APS0000')->sum('jumlah_k') : 0;
             $mutasiKeluar = $key->mutasiMasuk ? $key->mutasiMasuk->where('tujuan', 'APS0000')->sum('jumlah_k') : 0;
             $penyesuaian = $key->penyesuaian && $stok ? $key->penyesuaian->where('id_stok', $stok->id)->sum('jumlah_k') : 0;
-
-            $sisa = (int)$stokAwalGud + (int)$penerimaan + (int)$mutasiMasuk + (int)$penyesuaian - (int)$mutasiKeluar - (int)$returPembelian;
-
+            if (empty($key->stok_awal)) {
+                $sisa = (int) $stok->jumlah_k;
+            } else {
+                $sisa = (int)$stokAwalGud + (int)$penerimaan + (int)$mutasiMasuk + (int)$penyesuaian - (int)$mutasiKeluar - (int)$returPembelian;
+            }
             if ($stok && $sisa > 0) {
                 $data[] = [
                     'kode_depo' => 'APS0000',
@@ -235,15 +237,18 @@ class StokOpnameController extends Controller
 
             $stokdepo = $key->stok ? $key->stok->firstWhere('kode_depo', $depo) : null;
             $itemDepos[] = $stokdepo;
-            $stokAwal = $key->stokAwal ? $key->stokAwal->where('kode_depo', $depo)->sum('jumlah_k') : 0;
+            $stokAwal = !empty($key->stok_awal) ? $key->stok_awal->where('kode_depo', $depo)->sum('jumlah_k') : 0;
             $penjualan = $key->penjualanRinci ? $key->penjualanRinci->sum('jumlah_k') : 0;
             $returPenjualan = $key->returPenjualanRinci ? $key->returPenjualanRinci->sum('jumlah_k') : 0;
             $mutasiMasuk = $key->mutasiMasuk ? $key->mutasiMasuk->where('dari', $depo)->sum('jumlah_k') : 0;
             $mutasiKeluar = $key->mutasiMasuk ? $key->mutasiMasuk->where('tujuan', $depo)->sum('jumlah_k') : 0;
 
             $penyesuaian = $key->penyesuaian && $stok  ? $key->penyesuaian->where('id_stok', $stok->id)->sum('jumlah_k') : 0;
-            $sisadepo = (int)$stokAwal + (int)$mutasiMasuk + (int)$returPenjualan + (int)$penyesuaian - (int)$penjualan - (int)$mutasiKeluar;
-
+            if (empty($key->stok_awal)) {
+                $sisadepo = (int) $stok->jumlah_k;
+            } else {
+                $sisadepo = (int)$stokAwal + (int)$mutasiMasuk + (int)$returPenjualan + (int)$penyesuaian - (int)$penjualan - (int)$mutasiKeluar;
+            }
             if ($stokdepo && $sisadepo > 0) {
                 $data[] = [
                     'kode_depo' => $depo,
