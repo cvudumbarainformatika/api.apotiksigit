@@ -61,10 +61,10 @@ services:
     ports:
       - "3307:3306"
     environment:
-      MYSQL_DATABASE: setiawandua
-      MYSQL_ROOT_PASSWORD: sasa0102
-      MYSQL_PASSWORD: sasa0102
-      MYSQL_USER: admin
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
     volumes:
       - dbdata:/var/lib/mysql/
       - ./docker-compose/mysql/my.conf:/etc/mysql/conf.d/my.cnf
