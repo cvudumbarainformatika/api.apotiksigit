@@ -24,8 +24,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/autogen', function () {
-    $user = User::limit(10)->get();
-    return $user;
+    // $user = User::limit(10)->get();
+    // return $user;
+    echo 'SELAMAT DATANG';
 });
 
 // Route::get('/cek', [CekDataController::class, 'index']);
