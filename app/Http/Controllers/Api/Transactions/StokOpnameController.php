@@ -216,11 +216,11 @@ class StokOpnameController extends Controller
             $mutasiMasuk = $key->mutasiMasuk ? $key->mutasiMasuk->where('dari', 'APS0000')->sum('jumlah_k') : 0;
             $mutasiKeluar = $key->mutasiMasuk ? $key->mutasiMasuk->where('tujuan', 'APS0000')->sum('jumlah_k') : 0;
             $penyesuaian = $key->penyesuaian && $stok ? $key->penyesuaian->where('id_stok', $stok->id)->sum('jumlah_k') : 0;
-            if (empty($key->stok_awal)) {
-                $sisa = (int) $stok->jumlah_k;
-            } else {
-                $sisa = (int)$stokAwalGud + (int)$penerimaan + (int)$mutasiMasuk + (int)$penyesuaian - (int)$mutasiKeluar - (int)$returPembelian;
-            }
+            // if (empty($key->stok_awal)) {
+            //     $sisa = (int) $stok->jumlah_k;
+            // } else {
+            $sisa = (int)$stokAwalGud + (int)$penerimaan + (int)$mutasiMasuk + (int)$penyesuaian - (int)$mutasiKeluar - (int)$returPembelian;
+            // }
             if ($stok && $sisa > 0) {
                 $data[] = [
                     'kode_depo' => 'APS0000',
@@ -244,11 +244,11 @@ class StokOpnameController extends Controller
             $mutasiKeluar = $key->mutasiMasuk ? $key->mutasiMasuk->where('tujuan', $depo)->sum('jumlah_k') : 0;
 
             $penyesuaian = $key->penyesuaian && $stok  ? $key->penyesuaian->where('id_stok', $stok->id)->sum('jumlah_k') : 0;
-            if (empty($key->stok_awal)) {
-                $sisadepo = (int) $stok->jumlah_k;
-            } else {
-                $sisadepo = (int)$stokAwal + (int)$mutasiMasuk + (int)$returPenjualan + (int)$penyesuaian - (int)$penjualan - (int)$mutasiKeluar;
-            }
+            // if (empty($key->stok_awal)) {
+            //     $sisadepo = (int) $stok->jumlah_k;
+            // } else {
+            $sisadepo = (int)$stokAwal + (int)$mutasiMasuk + (int)$returPenjualan + (int)$penyesuaian - (int)$penjualan - (int)$mutasiKeluar;
+            // }
             if ($stokdepo && $sisadepo > 0) {
                 $data[] = [
                     'kode_depo' => $depo,
