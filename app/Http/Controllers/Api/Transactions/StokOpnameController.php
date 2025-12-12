@@ -221,7 +221,7 @@ class StokOpnameController extends Controller
             // } else {
             $sisa = (int)$stokAwalGud + (int)$penerimaan + (int)$mutasiMasuk + (int)$penyesuaian - (int)$mutasiKeluar - (int)$returPembelian;
             // }
-            if ($stok && $sisa > 0) {
+            if ($stok) {
                 $data[] = [
                     'kode_depo' => 'APS0000',
                     'kode_barang' => $key->kode,
@@ -249,7 +249,7 @@ class StokOpnameController extends Controller
             // } else {
             $sisadepo = (int)$stokAwal + (int)$mutasiMasuk + (int)$returPenjualan + (int)$penyesuaian - (int)$penjualan - (int)$mutasiKeluar;
             // }
-            if ($stokdepo && $sisadepo > 0) {
+            if ($stokdepo) {
                 $data[] = [
                     'kode_depo' => $depo,
                     'kode_barang' => $key->kode,
