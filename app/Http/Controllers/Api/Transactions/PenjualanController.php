@@ -105,8 +105,8 @@ class PenjualanController extends Controller
 
         $raw = PenjualanH::query();
         $raw->when(request('q'), function ($q) {
-            $q->where('nama', 'like', '%' . request('q') . '%')
-                ->orWhere('kode', 'like', '%' . request('q') . '%');
+            $q->where('nopenjualan', 'like', '%' . request('q') . '%');
+            // ->orWhere('kode', 'like', '%' . request('q') . '%');
         })
             ->when($req['from'], function ($q) use ($req) {
                 $q->whereBetween('tgl_penjualan', [$req['from'] . ' 00:00:00', $req['to'] . ' 23:59:59']);
