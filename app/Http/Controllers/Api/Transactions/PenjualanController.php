@@ -33,7 +33,8 @@ class PenjualanController extends Controller
         // tambah penjualan yang belum selesai -- ibarat alokasi... maping di front
         $data = Barang::when(request('q'), function ($q) {
             $q->where('nama', 'like', '%' . request('q') . '%')
-                ->orWhere('kode', 'like', '%' . request('q') . '%');
+                ->orWhere('kode', 'like', '%' . request('q') . '%')
+                ->orWhere('barcode', 'like', '%' . request('q') . '%');
         })
             ->with([
                 'stok' => function ($q) use ($profile) {
