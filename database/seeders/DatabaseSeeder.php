@@ -105,18 +105,7 @@ class DatabaseSeeder extends Seeder
                 'component' => 'IndexPage',
             ]
         );
-        $master->children()->updateOrCreate(
-            [
-                'title' => 'Master Rak',
-            ],
-            [
-                'icon' => 'tag',
-                'url' => 'admin/master/rak',
-                'name' => 'master.rak',
-                'view' => '/views/master/rak',
-                'component' => 'IndexPage',
-            ]
-        );
+        
         $master->children()->updateOrCreate(
             [
                 'title' => 'Master Kategori',
@@ -126,6 +115,18 @@ class DatabaseSeeder extends Seeder
                 'url' => 'admin/master/kategori',
                 'name' => 'master.kategori',
                 'view' => '/views/master/kategori',
+                'component' => 'IndexPage',
+            ]
+        );
+        $master->children()->updateOrCreate(
+            [
+                'title' => 'Master Barang',
+            ],
+            [
+                'icon' => 'tag',
+                'url' => 'admin/master/barang',
+                'name' => 'master.barang',
+                'view' => '/views/master/barang',
                 'component' => 'IndexPage',
             ]
         );
@@ -201,6 +202,42 @@ class DatabaseSeeder extends Seeder
                 'component' => 'IndexPage',
             ]
         );
+        // GUDANG
+        $gudang = Menu::firstOrCreate(
+            ['title' => 'Gudang'],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/gudang',
+                'name' => null,
+                'view' => null,
+                'component' => null,
+            ]
+        );
+        $gudang->children()->updateOrCreate(
+            [
+                'title' => 'Order Product',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/gudang/order',
+                'name' => 'gudang.order',
+                'view' => '/views/gudang/order',
+                'component' => 'IndexPage',
+            ]
+        );
+        $gudang->children()->updateOrCreate(
+            [
+                'title' => 'Penerimaan',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/gudang/penerimaan',
+                'name' => 'gudang.penerimaan',
+                'view' => '/views/gudang/penerimaan',
+                'component' => 'IndexPage',
+            ]
+        );
+
         //  TRANSAKSI
         $transaksi = Menu::firstOrCreate(
             ['title' => 'Transaksi'],
@@ -212,31 +249,45 @@ class DatabaseSeeder extends Seeder
                 'component' => null,
             ]
         );
+        
         // children
         $transaksi->children()->updateOrCreate(
             [
-                'title' => 'Order Product',
+                'title' => 'Permintaan',
             ],
             [
                 'icon' => 'layers',
-                'url' => 'admin/transaksi/order',
-                'name' => 'transaksi.order',
-                'view' => '/views/transaksi/order',
+                'url' => 'admin/transaksi/permintaan',
+                'name' => 'transaksi.permintaan',
+                'view' => '/views/transaksi/permintaan',
                 'component' => 'IndexPage',
             ]
-        );
+        ); 
         $transaksi->children()->updateOrCreate(
             [
-                'title' => 'Penerimaan',
+                'title' => 'Distribusi',
             ],
             [
                 'icon' => 'layers',
-                'url' => 'admin/transaksi/penerimaan',
-                'name' => 'transaksi.penerimaan',
-                'view' => '/views/transaksi/penerimaan',
+                'url' => 'admin/transaksi/distribusi',
+                'name' => 'transaksi.distribusi',
+                'view' => '/views/transaksi/distribusi',
                 'component' => 'IndexPage',
             ]
         );
+         $transaksi->children()->updateOrCreate(
+            [
+                'title' => 'Penerimaan Depo',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/transaksi/penerimaandepo',
+                'name' => 'transaksi.penerimaandepo',
+                'view' => '/views/transaksi/penerimaandepo',
+                'component' => 'IndexPage',
+            ]
+        );
+       
         $transaksi->children()->updateOrCreate(
             [
                 'title' => 'Penjualan',
@@ -294,6 +345,30 @@ class DatabaseSeeder extends Seeder
                 'url' => 'admin/transaksi/beban',
                 'name' => 'transaksi.beban',
                 'view' => '/views/transaksi/beban',
+                'component' => 'IndexPage',
+            ]
+        );
+        $transaksi->children()->updateOrCreate(
+            [
+                'title' => 'Pendapatan Lain',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/transaksi/pendapatanlain',
+                'name' => 'transaksi.pendapatanlain',
+                'view' => '/views/transaksi/pendapatanlain',
+                'component' => 'IndexPage',
+            ]
+        );
+        $transaksi->children()->updateOrCreate(
+            [
+                'title' => 'Pembayaran Hutang',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/transaksi/pembyhutang',
+                'name' => 'transaksi.pembyhutang',
+                'view' => '/views/transaksi/pembayaranhutang',
                 'component' => 'IndexPage',
             ]
         );
