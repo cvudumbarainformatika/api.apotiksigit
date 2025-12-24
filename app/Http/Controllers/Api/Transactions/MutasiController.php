@@ -531,7 +531,8 @@ class MutasiController extends Controller
                 }
             }
             $user = Auth::user();
-            $penerima = $validated['penerima']  ?? $user->kode;
+            $kode = $user->kode ?? null;
+            $penerima = $validated['penerima']  ?? $kode;
             $mutasi->update([
                 'status' => '3',
                 'penerima' => $penerima,
