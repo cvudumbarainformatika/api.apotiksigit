@@ -93,15 +93,15 @@ class MutasiController extends Controller
             })
             ->with([
                 'rinci' => function ($q) use ($profile) {
-                    $q->with([
-                        'master:nama,kode,satuan_k,satuan_b,isi,kandungan',
-                        'stok' => function ($r) use ($profile) {
-                            $r->where('kode_depo', $profile->kode_toko);
-                        },
-                        'stokGudang' => function ($r) {
-                            $r->where('kode_depo', 'APS0000');
-                        },
-                    ]);
+                    $q->select('mutasi_requests.*', 'stoks.jumlah_k as jumlah_stok')
+                        ->leftJoin('mutasi_headers', 'mutasi_headers.id', '=', 'mutasi_requests.mutasi_header_id')
+                        ->leftJoin('stoks', function ($join) {
+                            $join->on('stoks.kode_barang', '=', 'mutasi_requests.kode_barang')
+                                ->on('stoks.kode_depo', '=', 'mutasi_headers.tujuan');
+                        })
+                        ->with([
+                            'master:nama,kode,satuan_k,satuan_b,isi,kandungan',
+                        ]);
                 },
                 'dari',
                 'tujuan'

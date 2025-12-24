@@ -15,7 +15,7 @@ class MutasiRequest extends Model
 
     public function header()
     {
-        return $this->hasOne(MutasiRequest::class, 'kode_mutasi', 'kode_mutasi');
+        return $this->hasOne(MutasiHeader::class, 'kode_mutasi', 'kode_mutasi');
     }
     public function master()
     {
