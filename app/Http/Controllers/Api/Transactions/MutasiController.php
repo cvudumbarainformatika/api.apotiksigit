@@ -505,7 +505,7 @@ class MutasiController extends Controller
         ]);
         try {
             DB::beginTransaction();
-            $mutasi = MutasiHeader::finc($validated['id']);
+            $mutasi = MutasiHeader::find($validated['id']);
             $profile = ProfileToko::first();
             if (!$mutasi) throw new Exception('Data Transaksi Mutasi tidak ditemukan');
             if ($mutasi->status == '3') throw new Exception('Data Transaksi Mutasi sudah Diterima');
