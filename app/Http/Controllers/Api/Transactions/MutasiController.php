@@ -107,11 +107,11 @@ class MutasiController extends Controller
                 'tujuan'
             ])
             ->orderBy($req['order_by'], $req['sort']);
-        if (request()->has('tujuan')) {
+        // if (request()->has('tujuan')) {
 
-            if (request('tujuan') == null || request('tujuan') == 'gudang') $raw->where('tujuan', 'APS0000');
-            else $raw->where('tujuan', request('tujuan'));
-        }
+        //     if (request('tujuan') == null || request('tujuan') == 'gudang') $raw->where('tujuan', 'APS0000');
+        //     else $raw->whereIn('tujuan', request('tujuan'));
+        // }
 
 
         $totalCount = (clone $raw)->count();
