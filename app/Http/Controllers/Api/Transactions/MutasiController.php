@@ -305,16 +305,27 @@ class MutasiController extends Controller
                 $code = $feed['code'];
 
                 if ((int)$status != 200 && (int)$code != 200) throw new Exception(json_encode($resp));
-            }
-            DB::commit();
+                DB::commit();
 
-            return new JsonResponse([
-                'status' => $status ?? null,
-                'code' => $code ?? null,
-                'feed' => $feed ?? null,
-                'data' => $mutasi,
-                'message' => 'Permintaan Mutasi Sudah dikirim',
-            ]);
+                return new JsonResponse([
+                    'status' => $status ?? null,
+                    'code' => $code ?? null,
+                    'feed' => $feed ?? null,
+                    'data' => $mutasi,
+                    'message' => 'Permintaan Mutasi Sudah dikirim ke server sebelah',
+                ]);
+            } else {
+
+                DB::commit();
+
+                return new JsonResponse([
+                    // 'status' => $status ?? null,
+                    // 'code' => $code ?? null,
+                    // 'feed' => $feed ?? null,
+                    'data' => $mutasi,
+                    'message' => 'Permintaan Mutasi Sudah dikirim, server satu jaringan',
+                ]);
+            }
         } catch (\Exception $e) {
             DB::rollBack();
             $data = json_decode($e->getMessage(), true);
@@ -460,18 +471,29 @@ class MutasiController extends Controller
                 $code = $feed['code'];
 
                 if ((int)$status != 200 || (int)$code != 200) throw new Exception(json_encode($resp));
+                DB::commit();
+
+                return new JsonResponse([
+                    'if' => (int)$status != 200 || (int)$code != 200,
+                    'feed' => $feed,
+                    'status' => $status,
+                    'code' => $code,
+                    'message' => 'Data Distribusi Sudah dikirim ke server sebelah',
+                    'data' => $mutasi,
+                ]);
+            } else {
+
+                DB::commit();
+
+                return new JsonResponse([
+                    // 'if' => (int)$status != 200 || (int)$code != 200,
+                    // 'feed' => $feed,
+                    // 'status' => $status,
+                    // 'code' => $code,
+                    'message' => 'Data Distribusi Sudah dikirim, server lokal',
+                    'data' => $mutasi,
+                ]);
             }
-
-            DB::commit();
-
-            return new JsonResponse([
-                'if' => (int)$status != 200 || (int)$code != 200,
-                'feed' => $feed,
-                'status' => $status,
-                'code' => $code,
-                'message' => 'Data Distribusi Sudah dikirim',
-                'data' => $mutasi,
-            ]);
         } catch (\Exception $e) {
             DB::rollBack();
 
