@@ -289,8 +289,11 @@ class MutasiController extends Controller
                 }
             ]);
 
+
+
             $cabangMinta = Cabang::where('kodecabang', $mutasi->dari)->first();
             if ($cabangMinta->url != $cabangTujuan->url) {
+
                 $data = (object)[
                     'mutasi' => $mutasi,
                     'transaction' => 'permintaan'
@@ -298,34 +301,24 @@ class MutasiController extends Controller
                 $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
                 $kirim = Http::withHeaders([
                     'Accept' => 'application/json',
-                ])->post($url, $data);
+                ])->timeout(30)
+                    ->throw()
+                    ->post($url, $data);
                 $resp = json_decode($kirim, true);
-                $feed = $kirim->json('feedback');
-                $status = $kirim->status();
-                $code = $feed['code'];
+                // $feed = $kirim->json('feedback');
+                // $status = $kirim->status();
+                // $code = $feed['code'];
 
-                if ((int)$status != 200 && (int)$code != 200) throw new Exception(json_encode($resp));
-                DB::commit();
-
-                return new JsonResponse([
-                    'status' => $status ?? null,
-                    'code' => $code ?? null,
-                    'feed' => $feed ?? null,
-                    'data' => $mutasi,
-                    'message' => 'Permintaan Mutasi Sudah dikirim ke server sebelah',
-                ]);
-            } else {
-
-                DB::commit();
-
-                return new JsonResponse([
-                    // 'status' => $status ?? null,
-                    // 'code' => $code ?? null,
-                    // 'feed' => $feed ?? null,
-                    'data' => $mutasi,
-                    'message' => 'Permintaan Mutasi Sudah dikirim, server satu jaringan',
-                ]);
+                if (!$kirim->successful()) throw new Exception(json_encode($resp));
             }
+            DB::commit();
+            return new JsonResponse([
+                'status' => $status ?? null,
+                'code' => $code ?? null,
+                'feed' => $feed ?? null,
+                'data' => $mutasi,
+                'message' => 'Permintaan Mutasi Sudah dikirim ke server sebelah',
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             $data = json_decode($e->getMessage(), true);
@@ -414,14 +407,14 @@ class MutasiController extends Controller
             'id.required' => 'Id Header Mutasi harus di isi',
         ]);
         try {
-            DB::beginTransaction();
             $mutasi = MutasiHeader::find($validated['id']);
             if (!$mutasi) throw new Exception('Data Transaksi Mutasi tidak ditemukan');
             if ($mutasi->status == '2') throw new Exception('Data Transaksi Mutasi Sudah di disatribusikan');
 
             $cabangTujuan = Cabang::where('kodecabang', $mutasi->tujuan)->first();
             if (!$cabangTujuan) throw new Exception('Tujuan Mutasi tidak ditemukan, mohon cek tujuan mutasi');
-
+            DB::beginTransaction();
+            // DB::transaction(function () use ($mutasi) {
 
             // ambil rincian
             $rinci = MutasiRequest::where('mutasi_header_id', $mutasi->id)->get();
@@ -436,22 +429,14 @@ class MutasiController extends Controller
                 $sisa = $ada - $dist;
                 $stk->update(['jumlah_k' => $sisa]);
             }
-
             $mutasi->update([
                 'status' => '2',
                 'tgl_distribusi' => Carbon::now()->format('Y-m-d H:i:s')
             ]);
             $mutasi->load([
                 'rinci' => function ($q) {
-                    $profile = ProfileToko::first();
                     $q->with([
                         'master:nama,kode,satuan_k,satuan_b,isi,kandungan',
-                        'stok' => function ($r) use ($profile) {
-                            $r->where('kode_depo', $profile->kode_toko);
-                        },
-                        'stokGudang' => function ($r) use ($profile) {
-                            $r->where('kode_depo', 'APS0000');
-                        },
                     ]);
                 }
             ]);
@@ -461,40 +446,26 @@ class MutasiController extends Controller
                     'mutasi' => $mutasi,
                     'transaction' => 'distribusi'
                 ];
-                $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
+                $url = $cabangMinta->url . 'v1/transactions/curl-mutasi/terima-curl';
+
                 $kirim = Http::withHeaders([
                     'Accept' => 'application/json',
-                ])->post($url, $data);
+                ])
+                    ->post($url, $data);
                 $resp = json_decode($kirim, true);
-                $feed = $kirim->json('feedback');
-                $status = $kirim->status();
-                $code = $feed['code'];
 
-                if ((int)$status != 200 || (int)$code != 200) throw new Exception(json_encode($resp));
-                DB::commit();
-
-                return new JsonResponse([
-                    'if' => (int)$status != 200 || (int)$code != 200,
-                    'feed' => $feed,
-                    'status' => $status,
-                    'code' => $code,
-                    'message' => 'Data Distribusi Sudah dikirim ke server sebelah',
-                    'data' => $mutasi,
-                ]);
-            } else {
-
-                DB::commit();
-
-                return new JsonResponse([
-                    // 'if' => (int)$status != 200 || (int)$code != 200,
-                    // 'feed' => $feed,
-                    // 'status' => $status,
-                    // 'code' => $code,
-                    'message' => 'Data Distribusi Sudah dikirim, server lokal',
-                    'data' => $mutasi,
-                ]);
+                if (!$kirim->successful()) throw new Exception(json_encode($resp));
             }
-        } catch (\Exception $e) {
+            DB::commit();
+
+            return new JsonResponse([
+                'resp' => $resp ?? null,
+                'status' => $status ?? null,
+                'code' => $code ?? null,
+                'message' => 'Data Distribusi Sudah dikirim ke server sebelah',
+                'data' => $mutasi,
+            ]);
+        } catch (\Throwable $e) {
             DB::rollBack();
 
             $data = json_decode($e->getMessage(), true);
@@ -504,6 +475,8 @@ class MutasiController extends Controller
                         'message' => $data['feedback']['message'],
                         'code' => $data['feedback']['code'],
                         'trace' => $data['feedback']['trx'],
+                        'kirim' => $kirim ?? null,
+                        'data' => $data,
                     ],
                     $data['code'] ?? 410
                 );
@@ -531,6 +504,8 @@ class MutasiController extends Controller
             $profile = ProfileToko::first();
             if (!$mutasi) throw new Exception('Data Transaksi Mutasi tidak ditemukan');
             if ($mutasi->status == '3') throw new Exception('Data Transaksi Mutasi sudah Diterima');
+            $cabangTujuan = Cabang::where('kodecabang', $mutasi->tujuan)->first();
+            if (!$cabangTujuan) throw new Exception('Tujuan Mutasi tidak ditemukan, mohon cek tujuan mutasi');
             // ambil rincian
             $rinci = MutasiRequest::where('mutasi_header_id', $mutasi->id)->get();
             $kode = $rinci->pluck('kode_barang');
@@ -560,6 +535,22 @@ class MutasiController extends Controller
                 'penerima' => $penerima,
                 'tgl_terima' => Carbon::now()->format('Y-m-d H:i:s')
             ]);
+            $cabangMinta = Cabang::where('kodecabang', $mutasi->dari)->first();
+            if ($cabangMinta->url != $cabangTujuan->url) {
+                $data = (object)[
+                    'mutasi' => $mutasi,
+                    'transaction' => 'terima'
+                ];
+                $url = $cabangTujuan->url . 'v1/transactions/curl-mutasi/terima-curl';
+
+                $kirim = Http::withHeaders([
+                    'Accept' => 'application/json',
+                ])
+                    ->post($url, $data);
+                $resp = json_decode($kirim, true);
+
+                if (!$kirim->successful()) throw new Exception(json_encode($resp));
+            }
             DB::commit();
             $mutasi->load([
                 'rinci' => function ($q) use ($profile) {
@@ -597,6 +588,7 @@ class MutasiController extends Controller
         $code = 200;
         if ($request->transaction == 'permintaan') $trx = self::curlKirimPermintaan($request->mutasi);
         if ($request->transaction == 'distribusi') $trx = self::curlKirimDistribusi($request->mutasi);
+        if ($request->transaction == 'terima') $trx = self::curlTerimaDistribusi($request->mutasi);
         $code = $trx['code'] ?? 410;
         if ($code == 410) $message = $trx['message'];
         $feedback = [
@@ -627,6 +619,7 @@ class MutasiController extends Controller
                 'tgl_distribusi' => $req['tgl_distribusi'],
                 'tgl_terima' => $req['tgl_terima'],
                 'status' => $req['status'],
+                // 'status' => '1',
 
             ]);
             foreach ($req['rinci'] as $rinci) {
@@ -678,6 +671,7 @@ class MutasiController extends Controller
                 'tgl_distribusi' => $req['tgl_distribusi'],
                 'tgl_terima' => $req['tgl_terima'],
                 'status' => $req['status'],
+                // 'status' => '2',
 
             ]);
             foreach ($req['rinci'] as $rinci) {
@@ -694,6 +688,45 @@ class MutasiController extends Controller
             }
 
             $mutasi->load('rinci');
+            DB::commit();
+            return [
+                // 'rinci' => $req['rinci'],
+                'mutasi' => $mutasi,
+                // 'requset' => $req,
+                'code' => 200
+
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return [
+                'code' => 410,
+                'message' =>  $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTrace(),
+
+            ];
+        }
+    }
+    public static function curlTerimaDistribusi($req)
+    {
+        try {
+            DB::beginTransaction();
+            // $mutasi = MutasiHeader::where('kode_mutasi', $req['kode_mutasi'])->where('dari', $req['dari'])->where('tujuan', $req['tujuan'])->first();
+            $mutasi = MutasiHeader::updateOrCreate([
+                'kode_mutasi' => $req['kode_mutasi'],
+                'dari' => $req['dari'],
+                'tujuan' => $req['tujuan']
+            ], [
+                'pengirim' => $req['pengirim'],
+                'penerima' => $req['penerima'],
+                'tgl_permintaan' => $req['tgl_permintaan'],
+                'tgl_distribusi' => $req['tgl_distribusi'],
+                'tgl_terima' => $req['tgl_terima'],
+                'status' => $req['status'],
+                // 'status' => '2',
+
+            ]);
             DB::commit();
             return [
                 // 'rinci' => $req['rinci'],
