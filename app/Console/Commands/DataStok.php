@@ -26,12 +26,12 @@ class DataStok extends Command
      */
     public function handle()
     {
-        $this->info('Migrasi Data Stok');
+        $this->info('[' . now()->format('d M Y H:i:s') . '] Migrasi Data Stok');
         $data = CekDataController::migrasiDataStok();
         if (!$data['status']) {
-            $this->error('❌ ' . $data['message']); // kasih info error ke terminal
+            $this->error('[' . now()->format('Y-m-d H:i:s') . '] ❌ ' . $data['message']); // kasih info error ke terminal
             return self::FAILURE; // biar command stop
         }
-        $this->info('✅ ' . $data['message']);
+        $this->info('[' . now()->format('Y-m-d H:i:s') . '] ✅ ' . $data['message']);
     }
 }
