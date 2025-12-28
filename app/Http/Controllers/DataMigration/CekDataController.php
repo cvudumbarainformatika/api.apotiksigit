@@ -164,7 +164,7 @@ class CekDataController extends Controller
                     'nama' => $old->infos['nama'],
                     'alamat' => $old->infos['alamat'],
                     'telepon' => $old->infos['tlp'],
-                    'pemilik' => $old->infos['pemilik'],
+                    'pemilik' => $old->infos['pemilik'] ?? '',
                     'kode_toko' => $old->kodecabang,
 
                 ]);
