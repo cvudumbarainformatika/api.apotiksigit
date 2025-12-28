@@ -6,17 +6,21 @@ use App\Models\OldApp\Master\Info;
 use App\Models\OldApp\Transaktions\DistribusiAntarToko;
 use App\Models\OldApp\Transaktions\StokOpname;
 use App\Models\OldApp\Transaktions\Transaction;
+use Illuminate\Support\Facades\Schema;
 
 class GetStokFromEachyHelper
 {
   public function getSingleDetails($header, $nama)
   {
     $dataOpname = [];
-    $tglOpnameTerakhir = StokOpname::select('tgl_opname')
-      ->whereDate('tgl_opname', '<', $header->from)
-      ->orderBy('tgl_opname', 'desc')->first();
-    if ($tglOpnameTerakhir) {
-      $dataOpname = StokOpname::select('jumlah as qty')->where('kode_produk', $header->kode_produk)->where('tgl_opname', $tglOpnameTerakhir->tgl_opname)->get();
+    $tglOpnameTerakhir = null;
+    if (Schema::connection('eachy')->hasTable('stok_opnames')) {
+      $tglOpnameTerakhir = StokOpname::select('tgl_opname')
+        ->whereDate('tgl_opname', '<', $header->from)
+        ->orderBy('tgl_opname', 'desc')->first();
+      if ($tglOpnameTerakhir) {
+        $dataOpname = StokOpname::select('jumlah as qty')->where('kode_produk', $header->kode_produk)->where('tgl_opname', $tglOpnameTerakhir->tgl_opname)->get();
+      }
     }
     if (sizeof($dataOpname)  > 0) {
       // $before = $dataOpname;
@@ -60,11 +64,13 @@ class GetStokFromEachyHelper
     // maka query tgl stok opnam adalah yg tanggal nya < request->from
     $me = Info::first();
     $dataOpname = [];
-    $tglOpnameTerakhir = StokOpname::select('tgl_opname')
-      ->whereDate('tgl_opname', '<', $header->from)
-      ->orderBy('tgl_opname', 'desc')->first();
-    if ($tglOpnameTerakhir) {
-      $dataOpname = StokOpname::select('jumlah as qty')->where('kode_produk', $header->kode_produk)->where('tgl_opname', $tglOpnameTerakhir->tgl_opname)->get();
+    if (Schema::connection('eachy')->hasTable('stok_opnames')) {
+      $tglOpnameTerakhir = StokOpname::select('tgl_opname')
+        ->whereDate('tgl_opname', '<', $header->from)
+        ->orderBy('tgl_opname', 'desc')->first();
+      if ($tglOpnameTerakhir) {
+        $dataOpname = StokOpname::select('jumlah as qty')->where('kode_produk', $header->kode_produk)->where('tgl_opname', $tglOpnameTerakhir->tgl_opname)->get();
+      }
     }
     if (sizeof($dataOpname) > 0) {
       $masukbefore = DistribusiAntarToko::select(

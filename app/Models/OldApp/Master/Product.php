@@ -15,11 +15,10 @@ class Product extends Model
 
     public function getStokAttribute()
     {
-        $model = new StokOpname();
-        $connection = $model->getConnectionName();
+
 
         $tglOpnameTerakhir = null;
-        if (Schema::connection($connection)->hasTable($model->getTable())) {
+        if (Schema::connection('eachy')->hasTable('stok_opnames')) {
             $tglOpnameTerakhir = StokOpname::select('tgl_opname')->orderBy('tgl_opname', 'desc')->first();
             if ($tglOpnameTerakhir) {
                 $dataOpname = StokOpname::select('jumlah as qty')->where('kode_produk', $this->kode_produk)->where('tgl_opname', $tglOpnameTerakhir->tgl_opname)->first();
