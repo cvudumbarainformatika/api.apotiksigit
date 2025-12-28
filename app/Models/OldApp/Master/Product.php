@@ -6,6 +6,7 @@ use App\Helpers\GetStokFromEachyHelper;
 use App\Models\OldApp\Transaktions\StokOpname;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class Product extends Model
 {
@@ -14,11 +15,17 @@ class Product extends Model
 
     public function getStokAttribute()
     {
+        $model = new StokOpname();
+        $connection = $model->getConnectionName();
 
-        $tglOpnameTerakhir = StokOpname::select('tgl_opname')->orderBy('tgl_opname', 'desc')->first();
-        if ($tglOpnameTerakhir) {
-            $dataOpname = StokOpname::select('jumlah as qty')->where('kode_produk', $this->kode_produk)->where('tgl_opname', $tglOpnameTerakhir->tgl_opname)->first();
+        $tglOpnameTerakhir = null;
+        if (Schema::connection($connection)->hasTable($model->getTable())) {
+            $tglOpnameTerakhir = StokOpname::select('tgl_opname')->orderBy('tgl_opname', 'desc')->first();
+            if ($tglOpnameTerakhir) {
+                $dataOpname = StokOpname::select('jumlah as qty')->where('kode_produk', $this->kode_produk)->where('tgl_opname', $tglOpnameTerakhir->tgl_opname)->first();
+            }
         }
+
         $header = (object) array(
             // 'from' => $tglOpnameTerakhir->tgl_opname ?? date('Y-m-d'),
             'from' => date('Y-m-d'),
