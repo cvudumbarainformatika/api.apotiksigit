@@ -76,7 +76,7 @@ class BebanController extends Controller
         return new JsonResponse([
             'data' => $data,
             'message' => 'Data beban berhasil disimpan'
-        ], 410);
+        ]);
     }
 
     public function hapus(Request $request)

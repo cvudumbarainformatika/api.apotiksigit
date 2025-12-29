@@ -83,7 +83,7 @@ class RakController extends Controller
         return new JsonResponse([
             'data' => $data,
             'message' => 'Data rak berhasil disimpan'
-        ], 410);
+        ]);
     }
 
     public function hapus(Request $request)

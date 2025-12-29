@@ -83,7 +83,7 @@ class JabatanController extends Controller
         return new JsonResponse([
             'data' => $data,
             'message' => 'Data jabatan berhasil disimpan'
-        ], 410);
+        ]);
     }
 
     public function hapus(Request $request)

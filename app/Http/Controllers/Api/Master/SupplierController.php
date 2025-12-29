@@ -86,7 +86,7 @@ class SupplierController extends Controller
         return new JsonResponse([
             'data' => $data,
             'message' => 'Data supplier berhasil disimpan'
-        ], 410);
+        ]);
     }
 
     public function hapus(Request $request)

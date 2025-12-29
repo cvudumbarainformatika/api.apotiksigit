@@ -85,7 +85,7 @@ class DokterController extends Controller
         return new JsonResponse([
             'data' => $data,
             'message' => 'Data barang berhasil disimpan'
-        ], 410);
+        ]);
     }
 
     public function hapus(Request $request)

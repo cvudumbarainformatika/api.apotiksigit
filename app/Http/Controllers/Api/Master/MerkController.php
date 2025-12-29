@@ -43,6 +43,13 @@ class MerkController extends Controller
     public function store(Request $request)
     {
         // return new JsonResponse($request->all());
+        $cek = MasterHelper::isGundangHere();
+        if (!$cek) {
+            return new JsonResponse([
+                'cabang' => $cek,
+                'message' => 'Perubahan data Master hanya bisa dilakukan di cabang gundang'
+            ], 410);
+        }
         $kode = $request->kode;
         $validated = $request->validate([
             'nama' => 'required|unique:merks,nama',
@@ -73,7 +80,7 @@ class MerkController extends Controller
         $data->load('failed');
         return new JsonResponse([
             'data' => $data,
-            'kirim' => $kirim,
+            // 'kirim' => $kirim,
             'message' => 'Data Merk berhasil disimpan'
         ]);
     }
