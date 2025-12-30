@@ -191,4 +191,17 @@ class AuthController extends Controller
             'user' => $user
         ]);
     }
+    public function delete(Request $request)
+    {
+        $user = User::find($request->id);
+        if (!$user) {
+            return new JsonResponse([
+                'message' => 'User tidak ditemukan'
+            ], 404);
+        }
+        $user->delete();
+        return new JsonResponse([
+            'user' => $user
+        ]);
+    }
 }

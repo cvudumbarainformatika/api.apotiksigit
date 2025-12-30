@@ -20,4 +20,5 @@ Route::group([
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/profile', [AuthController::class, 'profile']);
     Route::post('/update', [AuthController::class, 'update']);
+    Route::post('/delete', [AuthController::class, 'delete']);
 });
