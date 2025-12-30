@@ -105,7 +105,7 @@ class DatabaseSeeder extends Seeder
                 'component' => 'IndexPage',
             ]
         );
-        
+
         $master->children()->updateOrCreate(
             [
                 'title' => 'Master Kategori',
@@ -202,6 +202,18 @@ class DatabaseSeeder extends Seeder
                 'component' => 'IndexPage',
             ]
         );
+        $master->children()->updateOrCreate(
+            [
+                'title' => 'Master Apoteker',
+            ],
+            [
+                'icon' => 'users',
+                'url' => 'admin/master/apoteker',
+                'name' => 'master.apoteker',
+                'view' => '/views/master/apoteker',
+                'component' => 'IndexPage',
+            ]
+        );
         // GUDANG
         $gudang = Menu::firstOrCreate(
             ['title' => 'Gudang'],
@@ -249,7 +261,7 @@ class DatabaseSeeder extends Seeder
                 'component' => null,
             ]
         );
-        
+
         // children
         $transaksi->children()->updateOrCreate(
             [
@@ -262,7 +274,7 @@ class DatabaseSeeder extends Seeder
                 'view' => '/views/transaksi/permintaan',
                 'component' => 'IndexPage',
             ]
-        ); 
+        );
         $transaksi->children()->updateOrCreate(
             [
                 'title' => 'Distribusi',
@@ -275,7 +287,7 @@ class DatabaseSeeder extends Seeder
                 'component' => 'IndexPage',
             ]
         );
-         $transaksi->children()->updateOrCreate(
+        $transaksi->children()->updateOrCreate(
             [
                 'title' => 'Penerimaan Depo',
             ],
@@ -287,7 +299,7 @@ class DatabaseSeeder extends Seeder
                 'component' => 'IndexPage',
             ]
         );
-       
+
         $transaksi->children()->updateOrCreate(
             [
                 'title' => 'Penjualan',
