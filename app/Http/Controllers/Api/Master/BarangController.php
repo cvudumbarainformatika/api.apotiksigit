@@ -16,6 +16,14 @@ use Illuminate\Support\Facades\DB;
 class BarangController extends Controller
 {
     //
+    public function all()
+    {
+
+        $data = Barang::get();
+        return new JsonResponse([
+            'data' => $data
+        ]);
+    }
     public function index()
     {
         $req = [

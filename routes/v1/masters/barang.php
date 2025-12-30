@@ -8,6 +8,7 @@ Route::group([
     'middleware' => 'auth:sanctum',
     'prefix' => 'master/barang'
 ], function () {
+    Route::get('/all', [BarangController::class, 'all']);
     Route::get('/get-list', [BarangController::class, 'index']);
     Route::post('/simpan', [BarangController::class, 'store']);
     Route::post('/delete', [BarangController::class, 'hapus']);
