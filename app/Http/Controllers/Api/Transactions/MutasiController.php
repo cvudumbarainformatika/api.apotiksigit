@@ -145,9 +145,11 @@ class MutasiController extends Controller
             $user = Auth::user();
             $profile = ProfileToko::first();
             if (!$kode) {
+                $kodeDepo = $profile->kode_toko;
+                $hasilNya = substr($kodeDepo, -2);
                 DB::select('call kode_mutasi(@nomor)');
                 $nomor = DB::table('counter')->select('kode_mutasi')->first();
-                $kode_mutasi = FormatingHelper::genKodeBarang($nomor->kode_mutasi, 'TRX');
+                $kode_mutasi = FormatingHelper::genKodeBarang($nomor->kode_mutasi, $hasilNya . 'MTS');
             } else {
                 $kode_mutasi = $kode;
             }
@@ -183,8 +185,8 @@ class MutasiController extends Controller
             ]);
             DB::commit();
             $data->load([
-                'rinci' => function ($q) {
-                    $profile = ProfileToko::first();
+                'rinci' => function ($q) use ($profile) {
+                    // $profile = ProfileToko::first();
                     $q->with([
                         'master:nama,kode,satuan_k,satuan_b,isi,kandungan',
                         'stok' => function ($r) use ($profile) {
