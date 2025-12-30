@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('flag')->nullable()->default(null);
             $table->string('kode_user');
             $table->string('kode_supplier');
+            $table->string('kode_apoteker');
             $table->timestamps();
         });
     }

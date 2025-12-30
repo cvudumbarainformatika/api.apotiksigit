@@ -86,6 +86,7 @@ class OrderController extends Controller
             'nomor_order' => 'nullable',
             'tgl_order' => 'nullable',
             'kode_depo' => 'nullable',
+            'kode_apoteker' => 'nullable',
             'kode_supplier' => 'required',
             'kode_barang' => 'required',
             'jumlah_pesan' => 'required',
@@ -139,6 +140,7 @@ class OrderController extends Controller
                     'kode_user' => $user->kode,
                     'kode_supplier' => $validated['kode_supplier'],
                     'kode_depo' => $validated['kode_depo'],
+                    'kode_apoteker' => $validated['kode_apoteker'],
                     'tgl_order' => $validated['tgl_order'] ?? now(),
                 ]
             );
