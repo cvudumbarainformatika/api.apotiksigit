@@ -2,6 +2,7 @@
 
 namespace App\Models\Transactions;
 
+use App\Models\Master\Apoteker;
 use App\Models\Master\Cabang;
 use App\Models\Master\Supplier;
 use App\Traits\LogsActivity;
@@ -31,5 +32,9 @@ class OrderHeader extends Model
     public function cabang()
     {
         return $this->belongsTo(Cabang::class, 'kode_depo', 'kodecabang');
+    }
+    public function apoteker()
+    {
+        return $this->belongsTo(Apoteker::class, 'kode_apoteker', 'kode');
     }
 }

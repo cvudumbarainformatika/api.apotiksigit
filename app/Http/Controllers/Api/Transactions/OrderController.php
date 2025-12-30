@@ -68,6 +68,7 @@ class OrderController extends Controller
                 'orderRecords.master:nama,kode,satuan_k,satuan_b,isi,kandungan',
                 'supplier',
                 'cabang',
+                'apoteker',
                 'penerimaan.rincian'
             ])
             ->orderBy('order_headers.' . $req['order_by'], $req['sort']);
@@ -168,6 +169,7 @@ class OrderController extends Controller
                 'orderRecords.master:nama,kode,satuan_k,satuan_b,isi,kandungan',
                 'supplier',
                 'cabang',
+                'apoteker',
             ])->find($orderHeader->id);
 
             return new JsonResponse([
@@ -256,6 +258,8 @@ class OrderController extends Controller
             $orderHeader = OrderHeader::with([
                 'orderRecords.master:nama,kode,satuan_k,satuan_b,isi,kandungan',
                 'supplier',
+                'cabang',
+                'apoteker',
             ])->find($existingHeader->id);
 
             return new JsonResponse([
@@ -355,6 +359,8 @@ class OrderController extends Controller
             $orderHeader = OrderHeader::with([
                 'orderRecords.master:nama,kode,satuan_k,satuan_b,isi,kandungan',
                 'supplier',
+                'cabang',
+                'apoteker',
             ])->find($existingHeader->id);
 
             return new JsonResponse([
