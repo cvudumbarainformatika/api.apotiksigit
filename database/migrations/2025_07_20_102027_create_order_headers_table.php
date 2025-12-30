@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('nomor_order'); // Data Default From Procedure nomor_order(), Contoh Nilai TRX000001
             $table->date('tgl_order')->default(now());
             $table->string('flag')->nullable()->default(null);
-            $table->string('kode_user');
-            $table->string('kode_supplier');
-            $table->string('kode_apoteker');
+            $table->string('kode_user')->nullable();
+            $table->string('kode_supplier')->nullable();
+            $table->string('kode_apoteker')->nullable();
             $table->timestamps();
         });
     }
