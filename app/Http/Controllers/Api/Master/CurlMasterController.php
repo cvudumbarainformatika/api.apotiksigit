@@ -142,4 +142,11 @@ class CurlMasterController extends Controller
             'data' => $data,
         ]);
     }
+    public function getAllFailed()
+    {
+        $data = FailedToSend::get();
+        return new JsonResponse([
+            'data' => $data,
+        ]);
+    }
 }

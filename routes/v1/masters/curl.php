@@ -16,4 +16,5 @@ Route::group([
     'prefix' => 'master/curl'
 ], function () {
     Route::post('/re-send-all', [CurlMasterController::class, 'reSendAll']);
+    Route::get('/all-failed', [CurlMasterController::class, 'getAllFailed']);
 });
