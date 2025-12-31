@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('kode_user')->nullable();
             $table->string('cara_bayar')->dafault('tunai');
             $table->string('flag')->nullable();
+            $table->string('flag_setor')->nullable();
             $table->decimal('diskon', 20, 0)->default(0);
             $table->decimal('jumlah_bayar', 20, 0)->default(0);
             $table->decimal('kembali', 20, 0)->default(0);

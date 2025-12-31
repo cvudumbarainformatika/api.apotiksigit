@@ -24,6 +24,7 @@ class ProfileTokoController extends Controller
             'alamat' => 'nullable',
             'telepon' => 'nullable',
             'pemilik' => 'nullable',
+            'sipa' => 'nullable',
             'header' => 'nullable',
             'footer' => 'nullable',
             'pajak' => 'nullable',
