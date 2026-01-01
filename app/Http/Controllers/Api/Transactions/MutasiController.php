@@ -426,6 +426,8 @@ class MutasiController extends Controller
             $stok = Stok::lockForUpdate()->whereIn('kode_barang', $kode)->where('kode_depo', $mutasi->tujuan)->get();
             // kurangi stok
             foreach ($rinci as $key) {
+                if ((float) $key['distribusi'] == 0.0) continue; // lanjut ke data berikutnya
+
                 $stk = $stok->firstWhere('kode_barang', $key['kode_barang']);
                 if (!$stk) throw new Exception('Data Stok tidak ditemukan');
                 $ada = (float) $stk->jumlah_k;
