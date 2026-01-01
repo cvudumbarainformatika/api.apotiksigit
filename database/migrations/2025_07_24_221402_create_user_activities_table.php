@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('action'); // misalnya: 'Login', 'Create Order', 'Update Product'
-            $table->string('description')->nullable(); // optional detail
+            $table->text('description')->nullable(); // optional detail
             $table->ipAddress('ip_address')->nullable();
             $table->string('user_agent')->nullable();
             $table->timestamps();
