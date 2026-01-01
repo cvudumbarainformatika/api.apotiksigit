@@ -17,6 +17,10 @@ class ReturPenjualan_h extends Model
     {
         return $this->hasMany(ReturPenjualan_r::class, 'noretur', 'noretur');
     }
+    public function rinci()
+    {
+        return $this->hasMany(ReturPenjualan_r::class, 'noretur', 'noretur');
+    }
 
     public function penerimaan_h()
     {

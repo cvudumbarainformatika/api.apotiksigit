@@ -25,4 +25,12 @@ class PenjualanH extends Model
     {
         return $this->belongsTo(Dokter::class, 'kode_dokter', 'kode');
     }
+    public function retur()
+    {
+        return $this->hasOne(ReturPenjualan_h::class, 'nopenjualan', 'nopenjualan');
+    }
+    public function retur_rinci()
+    {
+        return $this->hasMany(ReturPenjualan_r::class, 'nopenjualan', 'nopenjualan');
+    }
 }

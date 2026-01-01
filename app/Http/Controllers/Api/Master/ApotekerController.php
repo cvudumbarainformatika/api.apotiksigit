@@ -40,7 +40,7 @@ class ApotekerController extends Controller
 
     public function store(Request $request)
     {
-        $kode = $request->kode;
+        $kode = $request->kode ?? null;
         $validated = $request->validate([
             'nama' => 'required',
             'kode' => 'nullable',
@@ -52,13 +52,13 @@ class ApotekerController extends Controller
 
         if (!$kode) {
             $lastId = Apoteker::max('id');
-            $validated['kode'] = FormatingHelper::genKodeDinLength(($lastId ?? 0)  + 1, 4, 'APT');
+            $kode = FormatingHelper::genKodeDinLength(($lastId ?? 0)  + 1, 4, 'APT');
         }
         try {
             DB::beginTransaction();
             $data = Apoteker::updateOrCreate(
                 [
-                    'kode' => $validated['kode']
+                    'kode' => $kode
                 ],
                 $validated
             );
@@ -75,7 +75,7 @@ class ApotekerController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTrace(),
 
-            ]);
+            ], 410);
         }
     }
 
