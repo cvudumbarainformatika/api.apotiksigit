@@ -156,7 +156,9 @@ class MutasiController extends Controller
             $tgl_permintaan = $validated['tgl_permintaan'] ? $validated['tgl_permintaan'] . date(' H:i:s') : Carbon::now()->format('Y-m-d H:i:s');
             $pengirim = $validated['pengirim']  ?? $user->kode;
             $dari = $validated['dari']  ?? $profile->kode_toko;
-            $data = MutasiHeader::find($id);
+            $databyid = MutasiHeader::find($id);
+            $databykdmutasi = MutasiHeader::where('kode_mutasi', $kode_mutasi)->first();
+            $data = $databyid ?? $databykdmutasi;
             if ($data) {
                 $data->update([
                     'kode_mutasi' => $kode_mutasi,
