@@ -102,7 +102,7 @@ class PembayaranSetoranController extends Controller
                     ]
                 );
                 $lastId = $data->id;
-                $notransaksi = FormatingHelper::genKodeDinLength(($lastId ?? 0)  + 1, 5, 'STR');
+                $notransaksi = FormatingHelper::genKodeDinLength(($lastId ?? 0), 5, 'STR');
                 $data->update(['notransaksi' => $notransaksi]);
             } else {
                 $nopenjualan = array_column($validated['penjualan'], 'nopenjualan');
@@ -111,8 +111,10 @@ class PembayaranSetoranController extends Controller
                     ->pluck('nopenjualan')
                     ->toArray();
                 // header
-                $data = PembayaranSetoran::where('notransaksi', $notransaksi)->firstOrFail();
-                $data = PembayaranSetoran::update(
+                $data = PembayaranSetoran::where('notransaksi', $notransaksi)->first();
+                if (!$data) throw new Exception('Pembayaran Setoran tidak tersimpan, tidak ada data dengan nomor transaksi ' . $notransaksi);
+                if ($data->flag != null) throw new Exception('Tidak Boleh Di update. Data sudah dikunci!');
+                $data->update(
                     [
                         'kode_user' => $user->kode,
                         'kode_cabang' => $kodeCabang,
@@ -121,7 +123,6 @@ class PembayaranSetoranController extends Controller
                 );
             }
 
-            if (!$data) throw new Exception('Pembayaran Setoran tidak tersimpan');
             // rinci
             foreach ($validated['penjualan'] as $key) {
                 $rinci = PembayaranSetoranRinci::updateOrCreate(
@@ -165,10 +166,13 @@ class PembayaranSetoranController extends Controller
     {
         $validated = $request->validate([
             'id' => 'required|exists:pembayaran_setorans,id'
+        ], [
+            'id.required' => 'Id Transaksi harus Ada',
+            'id.exists' => 'Id Transaksi Tidak ditemukan. Pastikan Transaksi dengan Id tersebut ADA',
         ]);
         try {
             DB::beginTransaction();
-            $data = PembayaranSetoran::findOrFail($validated['id']);
+            $data = PembayaranSetoran::find($validated['id']);
             if (!$data) throw new Exception('GAGAL KUNCI! Data Pembayaran Setoran tidak ditemukan');
             if ($data->flag === '1') throw new Exception('Pembayaran setoran sudah dikunci');
 
@@ -205,10 +209,13 @@ class PembayaranSetoranController extends Controller
     {
         $validated = $request->validate([
             'id' => 'required|exists:pembayaran_setorans,id'
+        ], [
+            'id.required' => 'Id Transaksi harus Ada',
+            'id.exists' => 'Id Transaksi Tidak ditemukan. Pastikan Transaksi dengan Id tersebut ADA',
         ]);
         try {
             DB::beginTransaction();
-            $data = PembayaranSetoran::findOrFail($validated['id']);
+            $data = PembayaranSetoran::find($validated['id']);
             if (!$data) throw new Exception('GAGAL HAPUS! Data Pembayaran Setoran tidak ditemukan');
             if ($data->flag === '1') throw new Exception('Pembayaran setoran sudah dikunci, Tidak boleh dihapus');
 
