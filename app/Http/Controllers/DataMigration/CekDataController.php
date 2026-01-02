@@ -36,6 +36,8 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class CekDataController extends Controller
 {
@@ -878,4 +880,168 @@ class CekDataController extends Controller
             ];
         }
     }
+
+
+    public static function cekDataBarangBelumAdaStok($command = null)
+    {
+        $profile   = ProfileToko::first();
+        $tglOpname = '2025-12-31 23:59:59';
+        $now       = now();
+
+        try {
+            DB::transaction(function () use ($profile, $tglOpname, $now, $command) {
+
+                /* =====================================================
+                 * STOK
+                 * ===================================================== */
+                $barangTanpaStok = Barang::select('kode', 'satuan_k')
+                    ->whereNotIn(
+                        'kode',
+                        fn($q) =>
+                        $q->select('kode_barang')->from('stoks')
+                    )->get();
+
+                $progressStok = null;
+                if ($command) {
+                    $command->line('▶ Membuat data stok...');
+                    $progressStok = new ProgressBar($command->getOutput(), $barangTanpaStok->count());
+                    $progressStok->setFormat(
+                        ' %current%/%max% [%bar%] %percent:3s%% | ETA: %estimated%'
+                    );
+                    $progressStok->start();
+                }
+
+                $dataStok = [];
+                foreach ($barangTanpaStok as $barang) {
+                    $dataStok[] = [
+                        'kode_barang' => $barang->kode,
+                        'kode_depo'   => $profile->kode_toko,
+                        'satuan_k'    => $barang->satuan_k,
+                        'jumlah_k'    => 0,
+                        'created_at'  => $now,
+                        'updated_at'  => $now,
+                    ];
+
+                    if ($progressStok) {
+                        $progressStok->advance();
+                    }
+                }
+
+                if ($progressStok) {
+                    $progressStok->finish();
+                    $command->newLine();
+                }
+
+                if (!empty($dataStok)) {
+                    Stok::insert($dataStok);
+                }
+
+                if ($command) {
+                    $command->info('   → ' . count($dataStok) . ' data stok berhasil dibuat');
+                }
+
+                /* =====================================================
+                 * STOK OPNAME
+                 * ===================================================== */
+                $barangTanpaStokOpname = Barang::select('kode', 'satuan_k')
+                    ->whereNotIn('kode', function ($q) use ($tglOpname) {
+                        $q->select('kode_barang')
+                            ->from('stok_opnames')
+                            ->where('tgl_opname', $tglOpname);
+                    })->get();
+
+                $progressOpname = null;
+                if ($command) {
+                    $command->line('▶ Membuat data stok opname...');
+                    $progressOpname = new ProgressBar($command->getOutput(), $barangTanpaStokOpname->count());
+                    $progressOpname->setFormat(
+                        ' %current%/%max% [%bar%] %percent:3s%% | ETA: %estimated%'
+                    );
+                    $progressOpname->start();
+                }
+
+                $dataOpname = [];
+                foreach ($barangTanpaStokOpname as $barang) {
+                    $dataOpname[] = [
+                        'kode_barang' => $barang->kode,
+                        'kode_depo'   => $profile->kode_toko,
+                        'satuan_k'    => $barang->satuan_k,
+                        'jumlah_k'    => 0,
+                        'tgl_opname'  => $tglOpname,
+                        'created_at'  => $now,
+                        'updated_at'  => $now,
+                    ];
+
+                    if ($progressOpname) {
+                        $progressOpname->advance();
+                    }
+                }
+
+                if ($progressOpname) {
+                    $progressOpname->finish();
+                    $command->newLine();
+                }
+
+                if (!empty($dataOpname)) {
+                    StokOpname::insert($dataOpname);
+                }
+
+                if ($command) {
+                    $command->info('   → ' . count($dataOpname) . ' data stok opname berhasil dibuat');
+                }
+            });
+
+            return [
+                'status'  => true,
+                'message' => 'Migrasi stok & stok opname selesai',
+            ];
+        } catch (\Throwable $e) {
+
+            Log::error('Migrasi stok gagal', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'status'  => false,
+                'message' => $e->getMessage(),
+            ];
+        }
+    }
+
+
+    // public static function cekDataBarangBelumAdaStok()
+    // {
+    //     $profile = ProfileToko::first();
+    //     $barangTanpaStok = Barang::select('kode', 'satuan_k')
+    //         ->whereNotIn('kode', function ($q) {
+    //             $q->select('kode_barang')->from('stoks');
+    //         })->get();
+
+    //     $barangTanpaStokOpname = Barang::select('kode', 'satuan_k')
+    //         ->whereNotIn('kode', function ($q) {
+    //             $q->select('kode_barang')
+    //                 ->from('stok_opnames')
+    //                 ->where('tgl_opname', '2025-12-31 23:59:59');
+    //         })->get();
+
+    //     foreach ($barangTanpaStok as $key) {
+
+    //         Stok::create([
+    //             'kode_barang' => $key['kode'],
+    //             'kode_depo' => $profile->kode_toko,
+    //             'satuan_k' => $key['satuan_k'],
+    //             'jumlah_k' => 0,
+    //         ]);
+    //     }
+    //     foreach ($barangTanpaStokOpname as $key) {
+
+    //         StokOpname::create([
+    //             'kode_barang' => $key['kode'],
+    //             'kode_depo' => $profile->kode_toko,
+    //             'satuan_k' => $key['satuan_k'],
+    //             'jumlah_k' => 0,
+    //             'tgl_opname' => '2025-12-31 23:59:59',
+    //         ]);
+    //     }
+    // }
 }
