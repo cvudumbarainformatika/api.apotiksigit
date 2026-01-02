@@ -149,7 +149,7 @@ class MutasiController extends Controller
                 $hasilNya = substr($kodeDepo, -2);
                 DB::select('call kode_mutasi(@nomor)');
                 $nomor = DB::table('counter')->select('kode_mutasi')->first();
-                $kode_mutasi = FormatingHelper::genKodeBarang($nomor->kode_mutasi, $hasilNya . 'MTS');
+                $kode_mutasi = FormatingHelper::notrans($nomor->kode_mutasi, $hasilNya . 'MTS');
             } else {
                 $kode_mutasi = $kode;
             }

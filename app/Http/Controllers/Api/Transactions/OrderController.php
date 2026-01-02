@@ -107,7 +107,7 @@ class OrderController extends Controller
         if (!$validated['nomor_order']) {
             DB::select('call nomor_order(@nomor)');
             $nomor = DB::table('counter')->select('nomor_order')->first();
-            $nomor_order = FormatingHelper::genKodeBarang($nomor->nomor_order, 'TRX');
+            $nomor_order = FormatingHelper::notrans($nomor->nomor_order, 'TRX');
         } else {
             $nomor_order = $request->nomor_order;
 

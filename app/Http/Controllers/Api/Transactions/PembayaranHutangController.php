@@ -143,7 +143,7 @@ class PembayaranHutangController extends Controller
             if (!$nomorPen) {
                 DB::select('call nomor_pembayaran_hutang(@nomor)');
                 $nomor = DB::table('counter')->select('nomor_pembayaran_hutang')->first();
-                $nopelunasan = FormatingHelper::genKodeBarang($nomor->nomor_pembayaran_hutang, 'TRXPEM');
+                $nopelunasan = FormatingHelper::notrans($nomor->nomor_pembayaran_hutang, 'TRXPEM');
             } else {
                 $nopelunasan = $request->nopelunasan;
             }

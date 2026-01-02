@@ -18,12 +18,12 @@ class FormatingHelper
 
 
         $hasil = str_pad($n, $len, '0', STR_PAD_LEFT);
-        return $kode . $hasil;
+        return $kode . $hasil . date('Ym');
     }
 
     public static function notrans($n, $kode)
     {
         $hasil = str_pad($n, 6, '0', STR_PAD_LEFT);
-        return $hasil.'-'. date("m"). '-' . date("Y") . "-" . $kode;
+        return $hasil . '-' . date("m") . '-' . date("Y") . "-" . $kode;
     }
 }
