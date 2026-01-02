@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Transactions;
 use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Transactions\OrderHeader;
 use App\Models\Transactions\Penerimaan_h;
 use App\Models\Transactions\Penerimaan_r;
 use App\Models\Transactions\Stok;
@@ -42,6 +43,45 @@ class PenerimaanController extends Controller
             ])
             ->select('penerimaan_hs.*')
             ->orderBy($req['order_by'], $req['sort']);
+        $totalCount = (clone $query)->count();
+        $data = $query->simplePaginate($req['per_page']);
+
+        $resp = ResponseHelper::responseGetSimplePaginate($data, $req, $totalCount);
+        return new JsonResponse($resp);
+    }
+
+    public function cariOrder()
+    {
+
+        $req = [
+            'order_by' => request('order_by', 'created_at'),
+            'sort' => request('sort', 'asc'),
+            'page' => request('page', 1),
+            'from' => request('from'),
+            'to' => request('to'),
+            'flag' => request('flag'),
+            'per_page' => request('per_page', 10),
+        ];
+
+        $query = OrderHeader::query()
+            ->select('order_headers.*')
+            ->leftJoin('penerimaan_hs', 'penerimaan_hs.noorder', '=', 'order_headers.nomor_order')
+            ->when(request('q'), function ($q) {
+                $q->leftJoin('suppliers', 'order_headers.kode_supplier', '=', 'suppliers.kode')
+                    ->where(function ($query) {
+                        $query->where('nomor_order', 'like', '%' . request('q') . '%')
+                            ->orWhere('kode_user', 'like', '%' . request('q') . '%')
+                            ->orWhere('suppliers.nama', 'LIKE', '%' . request('q') . '%');
+                    });
+            })
+            ->whereNotNull('order_headers.flag')
+            ->whereNull('penerimaan_hs.noorder')
+            ->with([
+                'orderRecords.master:nama,kode,satuan_k,satuan_b,isi,kandungan',
+                'supplier',
+                'penerimaan.rincian'
+            ])
+            ->orderBy('order_headers.' . $req['order_by'], $req['sort']);
         $totalCount = (clone $query)->count();
         $data = $query->simplePaginate($req['per_page']);
 

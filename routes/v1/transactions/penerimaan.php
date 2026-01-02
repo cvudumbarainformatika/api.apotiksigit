@@ -9,6 +9,7 @@ Route::group([
     'prefix' => 'transactions/penerimaan'
 ], function () {
     Route::get('/get-list', [PenerimaanController::class, 'index']);
+    Route::get('/get-list-order', [PenerimaanController::class, 'cariOrder']);
     Route::post('/simpan', [PenerimaanController::class, 'simpan']);
     Route::post('/lock_penerimaan', [PenerimaanController::class, 'lock_penerimaan']);
     Route::post('/delete', [PenerimaanController::class, 'hapus']);
