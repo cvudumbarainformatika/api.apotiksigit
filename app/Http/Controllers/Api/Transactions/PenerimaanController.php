@@ -117,6 +117,7 @@ class PenerimaanController extends Controller
             'flag' => 'nullable',
             'hutang' => 'required',
             'diskon_heder' => 'nullable',
+            'tgl_jatuh_tempo' => 'nullable',
         ], [
             'noorder.required' => 'No. Order Harus Di isi.',
             'tgl_penerimaan.required' => 'Tgl Penerimaan Harus Di isi.',
@@ -182,6 +183,7 @@ class PenerimaanController extends Controller
                     'tgl_penerimaan' => $validated['tgl_penerimaan'],
                     'nofaktur' => $validated['nofaktur'],
                     'tgl_faktur' => $validated['tgl_faktur'],
+                    'tgl_jatuh_tempo' => $validated['tgl_jatuh_tempo'],
                     'jenispajak' => $validated['jenispajak'],
                     'kode_user' => $user->kode,
                     'pajak' => $validated['pajak'],

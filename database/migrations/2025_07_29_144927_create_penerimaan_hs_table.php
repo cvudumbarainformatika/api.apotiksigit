@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('pajak')->nullable();
             $table->string('kode_user')->nullable();
             $table->string('flag')->nullable();
+            $table->date('tgl_jatuh_tempo')->nullable();
             $table->timestamps();
         });
     }
