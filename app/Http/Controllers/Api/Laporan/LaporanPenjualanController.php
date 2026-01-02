@@ -117,7 +117,6 @@ class LaporanPenjualanController extends Controller
             // ->orderBy($req['order_by'], $req['sort']);
             ->orderBy("penjualan_h_s.$orderBy", $req['sort']);
         $totalCount = (clone $raw)->count();
-        $data = $raw->simplePaginate($req['per_page']);
         // Hitung total per penjualan (dari relasi rinci)
         // $data->getCollection()->transform(function ($item) {
         //     $item->total_subtotal = $item->rinci->sum('subtotal');
@@ -139,11 +138,18 @@ class LaporanPenjualanController extends Controller
             ->first();
 
 
+        $data = $raw->simplePaginate($req['per_page']);
+
+
         $resp = ResponseHelper::responseGetSimplePaginate($data, $req, $totalCount);
+        $sub = $grandTotals ? (float) $grandTotals->total_subtotal : 0;
+        $ret = $grandTotals ? (float) $grandTotals->total_subtotal_retur : 0;
+        $tot = $sub - $ret;
         $resp['grand_total'] = [
-            'total_subtotal' => (float) $grandTotals->total_subtotal,
-            'total_subtotal_retur' => (float) $grandTotals->total_subtotal_retur,
-            'total_penjualan' => (float) $grandTotals->total_subtotal - (float) $grandTotals->total_subtotal_retur
+            'total_subtotal' => $sub,
+            'total_subtotal_retur' => $ret,
+            'total_penjualan' => $tot,
+            'grandTotals' => $grandTotals,
         ];
         return new JsonResponse($resp);
     }
