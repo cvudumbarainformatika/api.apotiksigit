@@ -250,6 +250,31 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $gudang->children()->updateOrCreate(
+            [
+                'title' => 'Permintaan',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/gudang/permintaan',
+                'name' => 'gudang.permintaan',
+                'view' => '/views/transaksi/permintaan',
+                'component' => 'IndexPage',
+            ]
+        );
+        $gudang->children()->updateOrCreate(
+            [
+                'title' => 'Distribusi',
+            ],
+            [
+                'icon' => 'layers',
+                'url' => 'admin/gudang/distribusi',
+                'name' => 'gudang.distribusi',
+                'view' => '/views/transaksi/distribusi',
+                'component' => 'IndexPage',
+            ]
+        );
+
         //  TRANSAKSI
         $transaksi = Menu::firstOrCreate(
             ['title' => 'Transaksi'],
