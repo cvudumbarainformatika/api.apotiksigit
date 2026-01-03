@@ -65,7 +65,10 @@ class PenerimaanController extends Controller
 
         $query = OrderHeader::query()
             ->select('order_headers.*')
-            ->leftJoin('penerimaan_hs', 'penerimaan_hs.noorder', '=', 'order_headers.nomor_order')
+            ->leftJoin('penerimaan_hs', function ($j) {
+                $j->on('penerimaan_hs.noorder', '=', 'order_headers.nomor_order')
+                    ->whereNotNull('penerimaan_hs.flag');
+            })
             ->when(request('q'), function ($q) {
                 $q->leftJoin('suppliers', 'order_headers.kode_supplier', '=', 'suppliers.kode')
                     ->where(function ($query) {
