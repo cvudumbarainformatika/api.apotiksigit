@@ -223,7 +223,7 @@ class MutasiController extends Controller
         $validated = $request->validate([
             'kode_barang' => 'required',
             'kode_mutasi' => 'required',
-            'id' => 'required',
+            // 'id' => 'required',
         ], [
             'kode_barang.required' => 'Tidak Ada Rincian untuk dihapus',
             'kode_mutasi.required' => 'Nomor Transaksi Harus di isi',
@@ -231,7 +231,7 @@ class MutasiController extends Controller
         try {
             DB::beginTransaction();
             $msg = 'Rincian Obat sudah dihapus';
-            $header = MutasiHeader::finc($validated['id']);
+            $header = MutasiHeader::where('kode_mutasi', $validated['kode_mutasi'])->first();
             if (!$header) throw new Exception('Data Header Mutasi tidak ditemukan, transaksi tidak bisa dilanjutkan');
             $rinci = MutasiRequest::where('kode_barang', $validated['kode_barang'])->where('mutasi_header_id', $header->id)->first();
             if (!$rinci) throw new Exception('Data Obat tidak ditemukan');
