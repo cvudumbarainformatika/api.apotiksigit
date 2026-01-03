@@ -287,8 +287,8 @@ class StokOpnameController extends Controller
     {
 
         $today =  date('Y-m-d');
-        $yesterday = date('Y-m-d', strtotime('-1 days'));
-        // $yesterday = date('Y-m-d', strtotime('-14 days'));
+        // $yesterday = date('Y-m-d', strtotime('-1 days'));
+        $yesterday = date('Y-m-d', strtotime('-14 days'));
         $lastDay = date('Y-m-01', strtotime($today));
         $dToday = date_create($today);
         $dLastDay = date_create($lastDay);
