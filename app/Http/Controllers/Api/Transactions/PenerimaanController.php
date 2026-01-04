@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\Transactions;
 use App\Helpers\Formating\FormatingHelper;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Master\Cabang;
+use App\Models\Setting\ProfileToko;
 use App\Models\Transactions\OrderHeader;
 use App\Models\Transactions\Penerimaan_h;
 use App\Models\Transactions\Penerimaan_r;
@@ -309,10 +311,10 @@ class PenerimaanController extends Controller
     {
         $validated = $request->validate([
             'nopenerimaan' => 'required',
-            'kode_depo' => 'required',
+            // 'kode_depo' => 'required',
         ], [
             'nopenerimaan.required' => 'No. Penerimaan Harus Di isi.',
-            'kode_depo.required' => 'Kode Depo Harus Di isi.',
+            // 'kode_depo.required' => 'Kode Depo Harus Di isi.',
         ]);
 
         $existingHeader = Penerimaan_h::where('nopenerimaan', $validated['nopenerimaan'])->first();
@@ -331,6 +333,15 @@ class PenerimaanController extends Controller
 
         try {
             DB::beginTransaction();
+            $profile = ProfileToko::first();
+            $cabang = Cabang::where('kodecabang', $profile->kode_toko)->first(); // cari Cabang
+            if (!$cabang) {
+                $depo = $profile->kode_toko;
+            } else {
+                $gudang = Cabang::where('url', $cabang->url)->where('kodecabang', '!=', $profile->kode_toko)->first();
+                if (!$gudang) $depo = $profile->kode_toko;
+                else $depo = $gudang->kodecabang;
+            }
             $existingHeader->update(['flag' => '1']);
             //  Penerimaan_h::where('nopenerimaan', $validated['nopenerimaan'])->update(['flag' => '1']);
             // $user = Auth::user();
@@ -339,7 +350,7 @@ class PenerimaanController extends Controller
                 Stok::updateOrCreate(
                     [
                         'kode_barang' => $value['kode_barang'],
-                        'kode_depo' => $validated['kode_depo'],
+                        'kode_depo' => $depo,
                     ],
                     [
                         'jumlah_k' => DB::raw('COALESCE(jumlah_k, 0) + ' . $value['jumlah_k']),
