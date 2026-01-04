@@ -146,7 +146,6 @@ class StokController extends Controller
                 },
                 'penerimaanRinci' => function ($q) use ($awalBulan, $akhirBulan) {
                     $q->select(
-                        'penerimaan_hs.tgl_penerimaan',
                         'penerimaan_rs.kode_barang',
                         DB::raw('sum(penerimaan_rs.jumlah_k) as jumlah_k'),
                     )
@@ -157,7 +156,6 @@ class StokController extends Controller
                 },
                 'ReturPembelianRinci' => function ($q) use ($awalBulan, $akhirBulan) {
                     $q->select(
-                        'retur_pembelian_hs.tglretur',
                         'retur_pembelian_rs.kode_barang',
                         DB::raw('sum(retur_pembelian_rs.jumlahretur_k) as jumlah_k'),
                     )
@@ -168,7 +166,6 @@ class StokController extends Controller
                 },
                 'mutasiMasuk' => function ($q) use ($awalBulan, $akhirBulan, $req) {
                     $q->select(
-                        'mutasi_headers.tgl_terima',
                         'mutasi_requests.kode_barang',
                         DB::raw('sum(mutasi_requests.distribusi) as distribusi'),
                     )
@@ -180,7 +177,6 @@ class StokController extends Controller
                 },
                 'mutasiKeluar' => function ($q) use ($awalBulan, $akhirBulan, $req) {
                     $q->select(
-                        'mutasi_headers.tgl_distribusi',
                         'mutasi_requests.kode_barang',
                         DB::raw('sum(mutasi_requests.distribusi) as distribusi'),
                     )
@@ -207,7 +203,6 @@ class StokController extends Controller
                 },
                 'penjualanRinci' => function ($q) use ($awalBulan, $akhirBulan) {
                     $q->select(
-                        'penjualan_h_s.tgl_penjualan',
                         'penjualan_r_s.kode_barang',
                         DB::raw('sum(penjualan_r_s.jumlah_k) as jumlah_k'),
                     )
@@ -218,7 +213,6 @@ class StokController extends Controller
                 },
                 'returPenjualanRinci' => function ($q) use ($awalBulan, $akhirBulan) {
                     $q->select(
-                        'retur_penjualan_hs.tgl_retur',
                         'retur_penjualan_rs.kode_barang',
                         DB::raw('sum(retur_penjualan_rs.jumlah_k) as jumlah_k'),
                     )
@@ -229,7 +223,6 @@ class StokController extends Controller
                 },
                 'mutasiMasuk' => function ($q) use ($awalBulan, $akhirBulan, $req) {
                     $q->select(
-                        'mutasi_headers.tgl_terima',
                         'mutasi_requests.kode_barang',
                         DB::raw('sum(mutasi_requests.distribusi) as distribusi'),
                     )
@@ -241,7 +234,6 @@ class StokController extends Controller
                 },
                 'mutasiKeluar' => function ($q) use ($awalBulan, $akhirBulan, $req) {
                     $q->select(
-                        'mutasi_headers.tgl_distribusi',
                         'mutasi_requests.kode_barang',
                         DB::raw('sum(mutasi_requests.distribusi) as distribusi'),
                     )
@@ -317,7 +309,7 @@ class StokController extends Controller
                     $q->select(
                         'mutasi_requests.kode_barang',
                         'mutasi_requests.distribusi',
-                        // 'mutasi_headers.dari',
+                        'mutasi_headers.tgl_terima',
                         // 'mutasi_headers.tujuan',
                     )
                         ->leftJoin('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
@@ -329,7 +321,7 @@ class StokController extends Controller
                     $q->select(
                         'mutasi_requests.kode_barang',
                         'mutasi_requests.distribusi',
-                        // 'mutasi_headers.dari',
+                        'mutasi_headers.tgl_distribusi',
                         // 'mutasi_headers.tujuan',
                     )
                         ->leftJoin('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
@@ -378,7 +370,7 @@ class StokController extends Controller
                         'mutasi_requests.kode_mutasi',
                         'mutasi_requests.kode_barang',
                         'mutasi_requests.distribusi',
-                        'mutasi_headers.tgl_terima as tanggal',
+                        'mutasi_headers.tgl_terima',
                         // 'mutasi_headers.tujuan',
                     )
                         ->leftJoin('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
@@ -391,7 +383,7 @@ class StokController extends Controller
                         'mutasi_requests.kode_mutasi',
                         'mutasi_requests.kode_barang',
                         'mutasi_requests.distribusi',
-                        'mutasi_headers.tgl_distribusi as tanggal',
+                        'mutasi_headers.tgl_distribusi',
                         // 'mutasi_headers.tujuan',
                     )
                         ->leftJoin('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
