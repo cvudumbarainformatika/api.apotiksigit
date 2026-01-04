@@ -37,7 +37,7 @@ class PembayaranSetoranController extends Controller
             ->orderBy($req['order_by'], $req['sort']);
         $totalCount = (clone $raw)->count();
         $data = $raw
-            ->with('failed')
+            ->with('rinci')
             ->simplePaginate($req['per_page']);
 
 
@@ -47,6 +47,7 @@ class PembayaranSetoranController extends Controller
     public function getPenjualan()
     {
         $data = PenjualanH::select(
+            'id',
             'nopenjualan',
             'tgl_penjualan',
             DB::raw('jumlah_bayar-kembali as nominal_cash'),
