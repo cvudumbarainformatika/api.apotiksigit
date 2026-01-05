@@ -106,7 +106,7 @@ class PembayaranSetoranController extends Controller
                 $data->update(['notransaksi' => $notransaksi]);
             } else {
                 $nopenjualan = array_column($validated['penjualan'], 'nopenjualan');
-                $notIncludes = $notIncludes = PembayaranSetoranRinci::where('notransaksi', $notransaksi)
+                $notIncludes  = PembayaranSetoranRinci::where('notransaksi', $notransaksi)
                     ->whereNotIn('nopenjualan', $nopenjualan)
                     ->pluck('nopenjualan')
                     ->toArray();
@@ -143,6 +143,8 @@ class PembayaranSetoranController extends Controller
 
             if (!empty($notIncludes)) {
                 $rinci = PembayaranSetoranRinci::whereIn('nopenjualan', $notIncludes)->delete();
+                $sisa = PembayaranSetoranRinci::where('notransaksi', $notransaksi)->count();
+                if ($sisa == 0 && $rinci > 0) $data->delete();
             }
 
             DB::commit();
