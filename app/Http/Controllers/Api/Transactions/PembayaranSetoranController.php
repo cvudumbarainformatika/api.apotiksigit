@@ -56,12 +56,12 @@ class PembayaranSetoranController extends Controller
             // total retur (BENAR)
             ->selectSub(function ($q) {
                 $q->from('retur_penjualan_rs')
-                    // ->selectRaw('SUM((COALESCE(harga,0) * COALESCE(jumlah_k,0)) - COALESCE(diskon,0))')
                     ->selectRaw('CAST(SUM((COALESCE(harga,0) * COALESCE(jumlah_k,0)) - COALESCE(diskon,0)) AS UNSIGNED)')
                     ->whereColumn('retur_penjualan_rs.nopenjualan', 'penjualan_h_s.nopenjualan');
             }, 'nominal_retur')
             ->whereNull('flag_setor')
             ->whereNotNull('flag')
+            ->havingRaw('nominal_retur IS NULL OR nominal_cash > nominal_retur')
             ->get();
         return new JsonResponse([
             'data' => $data
