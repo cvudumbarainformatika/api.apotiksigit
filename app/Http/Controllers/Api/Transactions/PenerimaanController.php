@@ -111,7 +111,7 @@ class PenerimaanController extends Controller
             'tgl_exprd' => 'required',
             'jumlah_b' => 'required',
             'jumlah_k' => 'required',
-            'harga_b' => 'required',
+            'harga_b' => 'required|numeric|gt:0',
             // 'harga' => 'required',
             'diskon_persen' => 'nullable',
             'isi' => 'required',
@@ -141,6 +141,8 @@ class PenerimaanController extends Controller
             'satuan_k.required' => 'Satuan Kecil Harus Di isi.',
             'satuan_b.required' => 'Satuan Besar Harus Di isi.',
             'hutang.required' => 'Kolom Hutang Harus Di isi.',
+            'harga_b.numeric'  => 'Harga Besar harus berupa angka.',
+            'harga_b.gt'       => 'Harga Besar harus lebih besar dari 0.',
         ]);
 
         // $user = Auth::user();
