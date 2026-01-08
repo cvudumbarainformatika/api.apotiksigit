@@ -522,7 +522,7 @@ class MutasiController extends Controller
                 $dist = (float) $key['distribusi'];
                 if (!$stk) {
                     Stok::create([
-                        'kode_depo' => $profile->kode_toko,
+                        'kode_depo' => $mutasi->dari,
                         'kode_barang' => $key['kode_barang'],
                         'satuan_k' => $key['satuan_k'],
                         'jumlah_k' => $dist,
