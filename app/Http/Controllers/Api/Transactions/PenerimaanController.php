@@ -75,7 +75,7 @@ class PenerimaanController extends Controller
                 $q->leftJoin('suppliers', 'order_headers.kode_supplier', '=', 'suppliers.kode')
                     ->where(function ($query) {
                         $query->where('nomor_order', 'like', '%' . request('q') . '%')
-                            ->orWhere('kode_user', 'like', '%' . request('q') . '%')
+                            ->orWhere('order_headers.kode_user', 'like', '%' . request('q') . '%')
                             ->orWhere('suppliers.nama', 'LIKE', '%' . request('q') . '%');
                     });
             })
