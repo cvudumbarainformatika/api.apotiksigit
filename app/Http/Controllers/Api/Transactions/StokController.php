@@ -310,6 +310,7 @@ class StokController extends Controller
                         'mutasi_requests.kode_barang',
                         'mutasi_requests.distribusi',
                         'mutasi_headers.tgl_terima',
+                        'mutasi_headers.kode_mutasi',
                         // 'mutasi_headers.tujuan',
                     )
                         ->leftJoin('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
@@ -322,6 +323,7 @@ class StokController extends Controller
                         'mutasi_requests.kode_barang',
                         'mutasi_requests.distribusi',
                         'mutasi_headers.tgl_distribusi',
+                        'mutasi_headers.kode_mutasi',
                         // 'mutasi_headers.tujuan',
                     )
                         ->leftJoin('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
