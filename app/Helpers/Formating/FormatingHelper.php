@@ -26,4 +26,9 @@ class FormatingHelper
         $hasil = str_pad($n, 6, '0', STR_PAD_LEFT);
         return $hasil . '-' . date("m") . '-' . date("Y") . "-" . $kode;
     }
+    public static function notransDay($n, $kode)
+    {
+        $hasil = str_pad($n, 6, '0', STR_PAD_LEFT);
+        return $hasil . '-' . date("Ymd") . "-" . $kode;
+    }
 }

@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('stok:opname')->everyFiveMinutes();
         // $schedule->command('stok:opname')->everyFifteenMinutes();
         $schedule->command('stok:opname')->dailyAt('00:20');
+        $schedule->command('counter:reset')->dailyAt('00:02');
     }
 
     /**
