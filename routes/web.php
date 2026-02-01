@@ -46,5 +46,6 @@ Route::get('/test-curl', function () {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
-Route::get('/opname', [StokOpnameController::class, 'simpan']);
+// Route::get('/opname', [StokOpnameController::class, 'simpan']);
+Route::get('/opname', [StokOpnameController::class, 'opnameOtomatis']);
 // Route::get('/curl-resend-all', [CurlMasterController::class, 'reSendAll']);

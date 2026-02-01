@@ -114,8 +114,8 @@ class StokController extends Controller
         $target = Carbon::create($req['tahun'], $req['bulan'], 1);
         $now = $target->copy()->startOfMonth();
         $last = $target->copy()->endOfMonth();
-        $akhirBulanLalu = $target->copy()->subMonth()->endOfMonth();
-        $lastMonth = $akhirBulanLalu->toDateString();
+        $akhirBulanLalu = $target->copy()->subMonthNoOverflow()->endOfMonth();
+        $lastMonth = $akhirBulanLalu->toDateString() . ' 23:59:59';
         $awalBulan = $now->toDateTimeString();
         $akhirBulan = $last->toDateTimeString();
         // $lastMonth = $akhirBulanLalu->toDateString();
@@ -124,6 +124,7 @@ class StokController extends Controller
         //     'akhirBulanLalu' => $akhirBulanLalu,
         //     'lastMonth' => $lastMonth,
         //     'awalBulan' => $awalBulan,
+        //     'akhirBulan' => $akhirBulan,
         // ]);
         $raw = Barang::query();
         $raw->when(request('q'), function ($q) {

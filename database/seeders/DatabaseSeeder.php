@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Models\Setting\HakAkses;
 use App\Models\Setting\Menu;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -16,18 +17,30 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $sa = User::where('username', '=', 'sa')->first();
-        if (!$sa) {
-            User::create([
+        User::firstOrCreate(
+            [
                 'kode' => 'USR000000',
+            ],
+            [
                 'username' => 'sa',
                 'nama' => 'Super Admin',
                 'password' => bcrypt('sasa0102'),
                 'email' => 'sa@app.com',
                 'kode_jabatan' => 'root',
-
-            ]);
-        }
+            ]
+        );
+        $demo = User::firstOrCreate(
+            [
+                'kode' => 'USR0000de',
+            ],
+            [
+                'username' => 'demo',
+                'nama' => 'Demo User',
+                'password' => bcrypt('demo1234'),
+                'email' => 'demo@app.com',
+                'kode_jabatan' => 'root',
+            ]
+        );
         // User::factory(5)->create();
         // \App\Models\User::factory(10)->create();
 
@@ -527,5 +540,26 @@ class DatabaseSeeder extends Seeder
                 'component' => 'IndexPage',
             ]
         );
+
+        $user = User::where('kode', 'USR0000de')->first();
+        $menus = Menu::with('children')->get(); // semua menu utama
+
+        foreach ($menus as $menu) {
+            // simpan hak akses menu
+            HakAkses::firstOrCreate([
+                'user_id' => $user->id,
+                'menu_id' => $menu->id,
+                'submenu_id' => null,
+            ]);
+
+            // ambil submenunya lewat relasi
+            foreach ($menu->children as $submenu) {
+                HakAkses::firstOrCreate([
+                    'user_id' => $user->id,
+                    'menu_id' => $menu->id,
+                    'submenu_id' => $submenu->id,
+                ]);
+            }
+        }
     }
 }
