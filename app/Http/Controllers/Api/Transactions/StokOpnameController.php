@@ -276,167 +276,277 @@ class StokOpnameController extends Controller
         // }
 
         $barang = Barang::select('kode')
-            // ->where('aktif', 1)
-            // ->where('kode', 'PRD02524')
-            ->cursor();
+            ->get()
+            ->keyBy('kode');
         $depo = $profile->kode_toko;
         $gudang = 'APS0000';
-        foreach ($barang as $b) {
+        // foreach ($barang as $b) {
 
-            /** =======================
-             *  GUDANG (APS0000)
-             *  ======================= */
+        //     /** =======================
+        //      *  GUDANG (APS0000)
+        //      *  ======================= */
 
-            $stokGudang = Stok::where('kode_barang', $b->kode)
-                ->where('kode_depo', $gudang)
-                ->first();
+        //     $stokGudang = Stok::where('kode_barang', $b->kode)
+        //         ->where('kode_depo', $gudang)
+        //         ->first();
 
-            if ($stokGudang) {
+        //     if ($stokGudang) {
 
-                $stokAwal = StokOpname::where('kode_barang', $b->kode)
-                    ->where('kode_depo', $gudang)
-                    ->whereDate('tgl_opname', $tglOpnameTerakhir)
-                    ->sum('jumlah_k');
+        //         $stokAwal = StokOpname::where('kode_barang', $b->kode)
+        //             ->where('kode_depo', $gudang)
+        //             ->whereDate('tgl_opname', $tglOpnameTerakhir)
+        //             ->sum('jumlah_k');
 
-                $penerimaan = Penerimaan_r::query()
-                    ->join('penerimaan_hs', 'penerimaan_hs.nopenerimaan', '=', 'penerimaan_rs.nopenerimaan')
-                    ->where('penerimaan_rs.kode_barang', $b->kode)
-                    ->whereBetween('penerimaan_hs.tgl_penerimaan', [$tglOpnameTerakhir, $akhirBulanLalu])
-                    ->whereNotNull('penerimaan_hs.flag')
-                    ->sum('penerimaan_rs.jumlah_k');
+        //         $penerimaan = Penerimaan_r::query()
+        //             ->join('penerimaan_hs', 'penerimaan_hs.nopenerimaan', '=', 'penerimaan_rs.nopenerimaan')
+        //             ->where('penerimaan_rs.kode_barang', $b->kode)
+        //             ->whereBetween('penerimaan_hs.tgl_penerimaan', [$tglOpnameTerakhir, $akhirBulanLalu])
+        //             ->whereNotNull('penerimaan_hs.flag')
+        //             ->sum('penerimaan_rs.jumlah_k');
 
-                $returPembelian = ReturPembelian_r::query()
-                    ->join('retur_pembelian_hs', 'retur_pembelian_hs.noretur', '=', 'retur_pembelian_rs.noretur')
-                    ->where('retur_pembelian_rs.kode_barang', $b->kode)
-                    ->whereBetween('retur_pembelian_hs.tglretur', [$tglOpnameTerakhir, $akhirBulanLalu])
-                    ->whereNotNull('retur_pembelian_hs.flag')
-                    ->sum('retur_pembelian_rs.jumlah_k');
+        //         $returPembelian = ReturPembelian_r::query()
+        //             ->join('retur_pembelian_hs', 'retur_pembelian_hs.noretur', '=', 'retur_pembelian_rs.noretur')
+        //             ->where('retur_pembelian_rs.kode_barang', $b->kode)
+        //             ->whereBetween('retur_pembelian_hs.tglretur', [$tglOpnameTerakhir, $akhirBulanLalu])
+        //             ->whereNotNull('retur_pembelian_hs.flag')
+        //             ->sum('retur_pembelian_rs.jumlah_k');
 
-                $mutasiMasuk = MutasiRequest::query()
-                    ->join('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
-                    ->where('mutasi_requests.kode_barang', $b->kode)
-                    ->where('mutasi_headers.dari', $gudang)
-                    ->whereBetween('mutasi_headers.tgl_terima', [$tglOpnameTerakhir, $akhirBulanLalu])
-                    ->whereIn('mutasi_headers.status', ['2', '3'])
-                    ->sum('mutasi_requests.distribusi');
+        //         $mutasiMasuk = MutasiRequest::query()
+        //             ->join('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
+        //             ->where('mutasi_requests.kode_barang', $b->kode)
+        //             ->where('mutasi_headers.dari', $gudang)
+        //             ->whereBetween('mutasi_headers.tgl_terima', [$tglOpnameTerakhir, $akhirBulanLalu])
+        //             ->whereIn('mutasi_headers.status', ['2', '3'])
+        //             ->sum('mutasi_requests.distribusi');
 
-                $mutasiKeluar = MutasiRequest::query()
-                    ->join('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
-                    ->where('mutasi_requests.kode_barang', $b->kode)
-                    ->where('mutasi_headers.tujuan', $gudang)
-                    ->whereBetween('mutasi_headers.tgl_distribusi', [$tglOpnameTerakhir, $akhirBulanLalu])
-                    ->whereIn('mutasi_headers.status', ['2', '3'])
-                    ->sum('mutasi_requests.distribusi');
+        //         $mutasiKeluar = MutasiRequest::query()
+        //             ->join('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
+        //             ->where('mutasi_requests.kode_barang', $b->kode)
+        //             ->where('mutasi_headers.tujuan', $gudang)
+        //             ->whereBetween('mutasi_headers.tgl_distribusi', [$tglOpnameTerakhir, $akhirBulanLalu])
+        //             ->whereIn('mutasi_headers.status', ['2', '3'])
+        //             ->sum('mutasi_requests.distribusi');
 
-                $penyesuaian = Penyesuaian::query()
-                    ->where('kode_barang', $b->kode)
-                    ->where('id_stok', $stokGudang->id)
-                    ->whereBetween('tgl_penyesuaian', [$tglOpnameTerakhir, $akhirBulanLalu])
-                    ->sum('jumlah_k');
+        //         $penyesuaian = Penyesuaian::query()
+        //             ->where('kode_barang', $b->kode)
+        //             ->where('id_stok', $stokGudang->id)
+        //             ->whereBetween('tgl_penyesuaian', [$tglOpnameTerakhir, $akhirBulanLalu])
+        //             ->sum('jumlah_k');
 
-                $sisa = (int)$stokAwal
-                    + (int)$penerimaan
-                    + (int)$mutasiMasuk
-                    + (int)$penyesuaian
-                    - (int)$mutasiKeluar
-                    - (int)$returPembelian;
+        //         $sisa = (int)$stokAwal
+        //             + (int)$penerimaan
+        //             + (int)$mutasiMasuk
+        //             + (int)$penyesuaian
+        //             - (int)$mutasiKeluar
+        //             - (int)$returPembelian;
+
+        //         $data[] = [
+        //             'kode_depo'   => 'APS0000',
+        //             'kode_barang' => $b->kode,
+        //             'satuan_k'   => $stokGudang->satuan_k,
+        //             'jumlah_k'   => $sisa,
+        //             'tgl_opname' => $akhirBulanLalu,
+        //             'created_at' => $created,
+        //             'updated_at' => $created,
+        //         ];
+        //         $items[] = [
+        //             'kode_depo'   => 'APS0000',
+        //             'stokAwal' => $stokAwal,
+        //             'penerimaan' => $penerimaan,
+        //             'returPembelian' => $returPembelian,
+        //             'mutasiMasuk' => $mutasiMasuk,
+        //             'mutasiKeluar' => $mutasiKeluar,
+        //             'penyesuaian' => $penyesuaian,
+        //             'sisa' => $sisa,
+        //         ];
+        //     }
+
+        //     /** =======================
+        //      *  DEPO
+        //      *  ======================= */
+
+        //     $stokDepo = Stok::where('kode_barang', $b->kode)
+        //         ->where('kode_depo', $depo)
+        //         ->first();
+
+        //     if ($stokDepo) {
+
+        //         $stokAwal = StokOpname::where('kode_barang', $b->kode)
+        //             ->where('kode_depo', $depo)
+        //             ->whereDate('tgl_opname', $tglOpnameTerakhir)
+        //             ->sum('jumlah_k');
+
+        //         $penjualan = PenjualanR::query()
+        //             ->join('penjualan_h_s', 'penjualan_h_s.nopenjualan', '=', 'penjualan_r_s.nopenjualan')
+        //             ->where('penjualan_r_s.kode_barang', $b->kode)
+        //             ->whereBetween('penjualan_h_s.tgl_penjualan', [$tglOpnameTerakhir, $akhirBulanLalu])
+        //             ->whereNotNull('penjualan_h_s.flag')
+        //             ->sum('penjualan_r_s.jumlah_k');
+
+        //         $returPenjualan = ReturPenjualan_r::query()
+        //             ->join('retur_penjualan_hs', 'retur_penjualan_hs.noretur', '=', 'retur_penjualan_rs.noretur')
+        //             ->where('retur_penjualan_rs.kode_barang', $b->kode)
+        //             ->whereBetween('retur_penjualan_hs.tgl_retur', [$tglOpnameTerakhir, $akhirBulanLalu])
+        //             ->whereNotNull('retur_penjualan_hs.flag')
+        //             ->sum('retur_penjualan_rs.jumlah_k');
+
+        //         $mutasiMasuk = MutasiRequest::query()
+        //             ->join('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
+        //             ->where('mutasi_requests.kode_barang', $b->kode)
+        //             ->where('mutasi_headers.dari', $depo)
+        //             ->whereIn('mutasi_headers.status', ['2', '3'])
+        //             ->sum('mutasi_requests.distribusi');
+
+        //         $mutasiKeluar = MutasiRequest::query()
+        //             ->join('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
+        //             ->where('mutasi_requests.kode_barang', $b->kode)
+        //             ->where('mutasi_headers.tujuan', $depo)
+        //             ->whereIn('mutasi_headers.status', ['2', '3'])
+        //             ->sum('mutasi_requests.distribusi');
+
+        //         $penyesuaian = Penyesuaian::query()
+        //             ->where('kode_barang', $b->kode)
+        //             ->where('id_stok', $stokDepo->id)
+        //             ->whereBetween('tgl_penyesuaian', [$tglOpnameTerakhir, $akhirBulanLalu])
+        //             ->sum('jumlah_k');
+
+        //         $sisaDepo = (int)$stokAwal
+        //             + (int)$mutasiMasuk
+        //             + (int)$returPenjualan
+        //             + (int)$penyesuaian
+        //             - (int)$penjualan
+        //             - (int)$mutasiKeluar;
+
+        //         $data[] = [
+        //             'kode_depo'   => $depo,
+        //             'kode_barang' => $b->kode,
+        //             'satuan_k'   => $stokDepo->satuan_k,
+        //             'jumlah_k'   => $sisaDepo,
+        //             'tgl_opname' => $akhirBulanLalu,
+        //             'created_at' => $created,
+        //             'updated_at' => $created,
+        //         ];
+        //         $items[] = [
+        //             'kode_depo'   => $depo,
+        //             'stokAwal' => $stokAwal,
+        //             'penjualan' => $penjualan,
+        //             'returPenjualan' => $returPenjualan,
+        //             'mutasiMasuk' => $mutasiMasuk,
+        //             'mutasiKeluar' => $mutasiKeluar,
+        //             'penyesuaian' => $penyesuaian,
+        //             'sisaDepo' => $sisaDepo,
+        //         ];
+        //     }
+        // }
+        // stok
+        $stok = Stok::select('id', 'kode_barang', 'kode_depo', 'satuan_k')
+            ->whereIn('kode_barang', $barang->keys())
+            ->get()
+            ->groupBy(['kode_barang', 'kode_depo']);
+        // stok awal (stok opname terakhir)
+        $stokAwal = StokOpname::whereDate('tgl_opname', $tglOpnameTerakhir)
+            ->groupBy('kode_barang', 'kode_depo')
+            ->selectRaw('kode_barang, kode_depo, SUM(jumlah_k) as total')
+            ->get()
+            ->groupBy(['kode_barang', 'kode_depo']);
+        // penerimaan (gudang)
+        $penerimaan = Penerimaan_r::query()
+            ->join('penerimaan_hs', 'penerimaan_hs.nopenerimaan', '=', 'penerimaan_rs.nopenerimaan')
+            ->whereBetween('penerimaan_hs.tgl_penerimaan', [$tglOpnameTerakhir, $akhirBulanLalu])
+            ->whereNotNull('penerimaan_hs.flag')
+            ->groupBy('penerimaan_rs.kode_barang')
+            ->selectRaw('penerimaan_rs.kode_barang, SUM(penerimaan_rs.jumlah_k) as total')
+            ->pluck('total', 'kode_barang');
+
+        // retur pembelian
+        $returPembelian = ReturPembelian_r::query()
+            ->join('retur_pembelian_hs', 'retur_pembelian_hs.noretur', '=', 'retur_pembelian_rs.noretur')
+            ->whereBetween('retur_pembelian_hs.tglretur', [$tglOpnameTerakhir, $akhirBulanLalu])
+            ->whereNotNull('retur_pembelian_hs.flag')
+            ->groupBy('retur_pembelian_rs.kode_barang')
+            ->selectRaw('retur_pembelian_rs.kode_barang, SUM(jumlah_k) as total')
+            ->pluck('total', 'kode_barang');
+
+        // penjualan
+        $penjualan = PenjualanR::query()
+            ->join('penjualan_h_s', 'penjualan_h_s.nopenjualan', '=', 'penjualan_r_s.nopenjualan')
+            ->whereBetween('penjualan_h_s.tgl_penjualan', [$tglOpnameTerakhir, $akhirBulanLalu])
+            ->whereNotNull('penjualan_h_s.flag')
+            ->groupBy('penjualan_r_s.kode_barang')
+            ->selectRaw('penjualan_r_s.kode_barang, SUM(jumlah_k) as total')
+            ->pluck('total', 'kode_barang');
+
+        // retur penjualan
+        $returPenjualan = ReturPenjualan_r::query()
+            ->join('retur_penjualan_hs', 'retur_penjualan_hs.noretur', '=', 'retur_penjualan_rs.noretur')
+            ->whereBetween('retur_penjualan_hs.tgl_retur', [$tglOpnameTerakhir, $akhirBulanLalu])
+            ->whereNotNull('retur_penjualan_hs.flag')
+            ->groupBy('retur_penjualan_rs.kode_barang')
+            ->selectRaw('retur_penjualan_rs.kode_barang, SUM(jumlah_k) as total')
+            ->pluck('total', 'kode_barang');
+
+        // mutasi masuk
+        $mutasiMasuk = MutasiRequest::query()
+            ->join('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
+            ->whereBetween('mutasi_headers.tgl_terima', [$tglOpnameTerakhir, $akhirBulanLalu])
+            ->whereIn('mutasi_headers.status', ['2', '3'])
+            ->groupBy('mutasi_requests.kode_barang', 'mutasi_headers.dari')
+            ->selectRaw('mutasi_requests.kode_barang, mutasi_headers.dari as depo, SUM(mutasi_requests.distribusi) as total')
+            ->get()
+            ->groupBy(['kode_barang', 'depo']);
+
+        // mutasi keluar
+        $mutasiKeluar = MutasiRequest::query()
+            ->join('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
+            ->whereBetween('mutasi_headers.tgl_distribusi', [$tglOpnameTerakhir, $akhirBulanLalu])
+            ->whereIn('mutasi_headers.status', ['2', '3'])
+            ->groupBy('mutasi_requests.kode_barang', 'mutasi_headers.tujuan')
+            ->selectRaw('mutasi_requests.kode_barang, mutasi_headers.tujuan as depo, SUM(mutasi_requests.distribusi) as total')
+            ->get()
+            ->groupBy(['kode_barang', 'depo']);
+
+        // penyesuaian
+        $penyesuaian = Penyesuaian::query()
+            ->whereBetween('tgl_penyesuaian', [$tglOpnameTerakhir, $akhirBulanLalu])
+            ->groupBy('kode_barang', 'id_stok')
+            ->selectRaw('kode_barang, id_stok, SUM(jumlah_k) as total')
+            ->get()
+            ->groupBy(['kode_barang', 'id_stok']);
+        foreach ($barang as $kode => $b) {
+
+            foreach ([$gudang, $depo] as $kdDepo) {
+
+                $stokItem = $stok[$kode][$kdDepo][0] ?? null;
+                if (!$stokItem) continue;
+
+                $awal = $stokAwal[$kode][$kdDepo][0]->total ?? 0;
+
+                $masuk = $mutasiMasuk[$kode][$kdDepo][0]->total ?? 0;
+                $keluar = $mutasiKeluar[$kode][$kdDepo][0]->total ?? 0;
+
+                $adj = $penyesuaian[$kode][$stokItem->id][0]->total ?? 0;
+
+                if ($kdDepo === $gudang) {
+                    $in  = $penerimaan[$kode] ?? 0;
+                    $out = $returPembelian[$kode] ?? 0;
+                } else {
+                    $in  = $returPenjualan[$kode] ?? 0;
+                    $out = $penjualan[$kode] ?? 0;
+                }
+
+                $sisa = (int)$awal + (int)$in + (int)$masuk + (int)$adj - (int)$out - (int)$keluar;
 
                 $data[] = [
-                    'kode_depo'   => 'APS0000',
-                    'kode_barang' => $b->kode,
-                    'satuan_k'   => $stokGudang->satuan_k,
-                    'jumlah_k'   => $sisa,
-                    'tgl_opname' => $akhirBulanLalu,
-                    'created_at' => $created,
-                    'updated_at' => $created,
+                    'kode_depo'   => $kdDepo,
+                    'kode_barang' => $kode,
+                    'satuan_k'    => $stokItem->satuan_k,
+                    'jumlah_k'    => $sisa,
+                    'tgl_opname'  => $akhirBulanLalu,
+                    'created_at'  => $created,
+                    'updated_at'  => $created,
                 ];
-                $items[] = [
-                    'kode_depo'   => 'APS0000',
-                    'stokAwal' => $stokAwal,
-                    'penerimaan' => $penerimaan,
-                    'returPembelian' => $returPembelian,
-                    'mutasiMasuk' => $mutasiMasuk,
-                    'mutasiKeluar' => $mutasiKeluar,
-                    'penyesuaian' => $penyesuaian,
-                    'sisa' => $sisa,
-                ];
-            }
 
-            /** =======================
-             *  DEPO
-             *  ======================= */
-
-            $stokDepo = Stok::where('kode_barang', $b->kode)
-                ->where('kode_depo', $depo)
-                ->first();
-
-            if ($stokDepo) {
-
-                $stokAwal = StokOpname::where('kode_barang', $b->kode)
-                    ->where('kode_depo', $depo)
-                    ->whereDate('tgl_opname', $tglOpnameTerakhir)
-                    ->sum('jumlah_k');
-
-                $penjualan = PenjualanR::query()
-                    ->join('penjualan_h_s', 'penjualan_h_s.nopenjualan', '=', 'penjualan_r_s.nopenjualan')
-                    ->where('penjualan_r_s.kode_barang', $b->kode)
-                    ->whereBetween('penjualan_h_s.tgl_penjualan', [$tglOpnameTerakhir, $akhirBulanLalu])
-                    ->whereNotNull('penjualan_h_s.flag')
-                    ->sum('penjualan_r_s.jumlah_k');
-
-                $returPenjualan = ReturPenjualan_r::query()
-                    ->join('retur_penjualan_hs', 'retur_penjualan_hs.noretur', '=', 'retur_penjualan_rs.noretur')
-                    ->where('retur_penjualan_rs.kode_barang', $b->kode)
-                    ->whereBetween('retur_penjualan_hs.tgl_retur', [$tglOpnameTerakhir, $akhirBulanLalu])
-                    ->whereNotNull('retur_penjualan_hs.flag')
-                    ->sum('retur_penjualan_rs.jumlah_k');
-
-                $mutasiMasuk = MutasiRequest::query()
-                    ->join('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
-                    ->where('mutasi_requests.kode_barang', $b->kode)
-                    ->where('mutasi_headers.dari', $depo)
-                    ->whereIn('mutasi_headers.status', ['2', '3'])
-                    ->sum('mutasi_requests.distribusi');
-
-                $mutasiKeluar = MutasiRequest::query()
-                    ->join('mutasi_headers', 'mutasi_headers.kode_mutasi', '=', 'mutasi_requests.kode_mutasi')
-                    ->where('mutasi_requests.kode_barang', $b->kode)
-                    ->where('mutasi_headers.tujuan', $depo)
-                    ->whereIn('mutasi_headers.status', ['2', '3'])
-                    ->sum('mutasi_requests.distribusi');
-
-                $penyesuaian = Penyesuaian::query()
-                    ->where('kode_barang', $b->kode)
-                    ->where('id_stok', $stokDepo->id)
-                    ->whereBetween('tgl_penyesuaian', [$tglOpnameTerakhir, $akhirBulanLalu])
-                    ->sum('jumlah_k');
-
-                $sisaDepo = (int)$stokAwal
-                    + (int)$mutasiMasuk
-                    + (int)$returPenjualan
-                    + (int)$penyesuaian
-                    - (int)$penjualan
-                    - (int)$mutasiKeluar;
-
-                $data[] = [
-                    'kode_depo'   => $depo,
-                    'kode_barang' => $b->kode,
-                    'satuan_k'   => $stokDepo->satuan_k,
-                    'jumlah_k'   => $sisaDepo,
-                    'tgl_opname' => $akhirBulanLalu,
-                    'created_at' => $created,
-                    'updated_at' => $created,
-                ];
-                $items[] = [
-                    'kode_depo'   => $depo,
-                    'stokAwal' => $stokAwal,
-                    'penjualan' => $penjualan,
-                    'returPenjualan' => $returPenjualan,
-                    'mutasiMasuk' => $mutasiMasuk,
-                    'mutasiKeluar' => $mutasiKeluar,
-                    'penyesuaian' => $penyesuaian,
-                    'sisaDepo' => $sisaDepo,
-                ];
+                // $items[] = compact('kdDepo', 'awal', 'in', 'out', 'masuk', 'keluar', 'adj', 'sisa');
             }
         }
         // return new JsonResponse([
