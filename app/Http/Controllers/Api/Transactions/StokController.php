@@ -115,7 +115,7 @@ class StokController extends Controller
         $now = $target->copy()->startOfMonth();
         $last = $target->copy()->endOfMonth();
         $akhirBulanLalu = $target->copy()->subMonthNoOverflow()->endOfMonth();
-        $lastMonth = $akhirBulanLalu->toDateString() . ' 23:59:59';
+        $lastMonth = $akhirBulanLalu->toDateString();
         $awalBulan = $now->toDateTimeString();
         $akhirBulan = $last->toDateTimeString();
         // $lastMonth = $akhirBulanLalu->toDateString();
